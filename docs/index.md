@@ -15,7 +15,7 @@ This documentation is rendered with the plugin itself, so it doubles as a demo o
 This MkDocs plugin...
 
 - ... styles your documentation like the [Webis homepage](https://webis.de/): a dark gray navigation bar with the Webis logo, the "Product Sans" and "Noto Sans" fonts, plain headings, blue links and buttons, flat tables, and a light gray footer,
-- ... lets you cite references from a BibTeX file with `[@key]` or `[@key1, @key2]`, rendered as gray author–year citations like [@fang2004formal], and appends a list of the cited references (including their BibTeX) to each page.
+- ... lets you cite references from a BibTeX file with `[@key]` or `[@key1, @key2]`, rendered as gray author–year citations like, and appends a list of the cited references (including their BibTeX) to each page.
 
 ## Installation
 

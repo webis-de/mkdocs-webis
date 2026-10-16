@@ -60,14 +60,12 @@ With a `bibliography` configured, cite references by their BibTeX keys:
 
 ```markdown
 Axioms are formal constraints on retrieval models [@fang2004formal].
-Several studies use axioms to re-rank results [@hagen2016axiomatic, @bondarenko2022axiomatic].
+Some studies use axioms for re-ranking [@hagen2016axiomatic, @bondarenko2022axiomatic].
 ```
 
 Citations are rendered as gray author–year links in brackets (e.g., "[Fang et al., 2004]" or "[Hagen et al., 2016; Bondarenko et al., 2022]"), like on the Webis slides.
 They link to a "References" section at the bottom of the same page, which lists all references cited on that page.
-Multiple keys are separated by commas (semicolons work, too).
-Citations inside code are not replaced, and unknown keys or invalid BibTeX fail the build.
-BibTeX files are parsed with [bibtexparser](https://github.com/sciunto-org/python-bibtexparser), and LaTeX markup in the fields is converted to plain text with [pylatexenc](https://github.com/phfaist/pylatexenc).
+Multiple keys are separated by commas or semicolons.
 
 We recommend copying BibTeX entries from [DBLP](https://dblp.org/).
 

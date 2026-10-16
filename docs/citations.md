@@ -6,13 +6,13 @@ With a `bibliography` configured, cite one or more references by their BibTeX ke
 
 ```markdown
 Axioms are formal constraints on retrieval models [@fang2004formal].
-Several studies use axioms to re-rank results [@hagen2016axiomatic, @bondarenko2022axiomatic].
+Some studies use axioms for re-ranking [@hagen2016axiomatic, @bondarenko2022axiomatic].
 ```
 
 Which renders as:
 
 Axioms are formal constraints on retrieval models [@fang2004formal].
-Several studies use axioms to re-rank results [@hagen2016axiomatic, @bondarenko2022axiomatic].
+Some studies use axioms for re-ranking [@hagen2016axiomatic, @bondarenko2022axiomatic].
 
 Citations are rendered as gray author–year links in brackets, like on the Webis slides.
 Each links to the "References" section at the bottom of the same page, which lists all references cited on that page, sorted by first author.
@@ -24,5 +24,5 @@ A journal article looks like this: [@fang2011diagnostic].
 - Citations inside inline code or code blocks are not replaced, as in the example above.
 - Unknown keys and invalid BibTeX files fail the build.
 - LaTeX markup in the BibTeX fields (e.g., `{\"{o}}` for "ö") is converted to plain text.
-- 
+
 We recommend copying BibTeX entries from [DBLP](https://dblp.org/).
