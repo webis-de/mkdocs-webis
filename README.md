@@ -36,15 +36,15 @@ theme:
   name: material
 
 plugins:
-  - search
   - webis:
-      bibliography: references.bib  # Optional: BibTeX file in your docs directory.
+      # Optional: BibTeX file in your docs directory.
+      bibliography: references.bib
 ```
 
 ### Configuration
 
 | Option | Default | Description |
-|:--|:--|:--|
+| :-- | :-- | :-- |
 | `style` | `true` | Add the Webis stylesheet. |
 | `palette` | `true` | Use the Webis light (`webis`) and dark (`webis-dark`) color schemes, with a toggle. Set to `false` to configure `theme.palette` yourself. |
 | `system_fonts` | `true` | Use the system's Helvetica-like fonts instead of Google Fonts. |
