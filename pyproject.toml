@@ -51,7 +51,7 @@ build-backend = "setuptools.build_meta"
 exclude = ["build", "venv", "tests"]
 
 [tool.setuptools.package-data]
-mkdocs_webis = ["assets/*", "py.typed"]
+mkdocs_webis = ["assets/*", "templates/partials/*", "py.typed"]
 
 [tool.setuptools_scm]
 

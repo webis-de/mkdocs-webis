@@ -23,9 +23,23 @@
   --webis-green: #32d296;
   --webis-orange: #faa05a;
   --webis-red: #f0506e;
+
+  /* Text size of webis.de: 13px, or 14px on high-resolution screens. */
+  --webis-font-size: 0.65rem;
+  --webis-line-height: 1.5;
+}
+
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  :root {
+    --webis-font-size: 0.7rem;
+    --webis-line-height: 1.6;
+  }
 }
 
 body {
+  /* Like webis.de, without Material's (thinner) antialiased font smoothing. */
+  -webkit-font-smoothing: auto;
+  -moz-osx-font-smoothing: auto;
   /* Like webis.de, use Product Sans or Noto Sans if installed (or loaded). */
   --md-text-font-family: "Product Sans", var(--md-text-font, "Noto Sans"),
     "Noto Sans", Verdana, sans-serif;
@@ -136,7 +150,9 @@ body {
 }
 
 /* ------------------------------------------------------------------------
- * Header and navigation tabs: the dark gray navigation bar of webis.de.
+ * Header: the dark gray navigation bar of webis.de (70px high, logo and
+ * site name, uppercase navigation links, then palette, repository, search).
+ * Font sizes follow webis.de (see --webis-font-size; Material's 1rem is 20px).
  * --------------------------------------------------------------------- */
 
 .md-header {
@@ -144,47 +160,183 @@ body {
   border-bottom: 1px solid var(--webis-dark-border);
 }
 
-/* With tabs, the line is drawn below the tabs instead. */
-@media screen and (min-width: 76.25em) {
-  body:has(.md-tabs) .md-header {
-    border-bottom: none;
+/* Unlike Material, webis.de does not scale its text up on wide screens. */
+html {
+  font-size: 125%;
+}
+
+/*
+ * Page width of webis.de: at most 1200px of content, with 40px padding from
+ * 960px (Material's 60em breakpoint) up, for the header and the main area.
+ */
+.md-grid {
+  max-width: 1280px;
+}
+
+@media screen and (min-width: 60em) {
+  .md-grid,
+  .md-header__inner.md-grid {
+    padding-left: 40px;
+    padding-right: 40px;
   }
+}
+
+/* Like webis.de, the content starts right at the left edge (or sidebar). */
+@media screen and (min-width: 60em) {
+  [dir="ltr"] .md-content > .md-content__inner,
+  [dir="ltr"] .md-sidebar--primary:not([hidden]) ~ .md-content > .md-content__inner {
+    margin-left: 0;
+  }
+
+  [dir="rtl"] .md-content > .md-content__inner,
+  [dir="rtl"] .md-sidebar--primary:not([hidden]) ~ .md-content > .md-content__inner {
+    margin-right: 0;
+  }
+}
+
+.md-header[data-md-state="shadow"],
+.md-header--shadow {
+  box-shadow: none;
+}
+
+.md-header__inner {
+  height: 3.5rem;
+}
+
+/* The logo starts at the content's edge, 15px before the site name. */
+.md-header__button.md-logo {
+  margin-left: 0;
+  margin-right: 0;
+  padding-left: 0;
+  padding-right: 15px;
 }
 
 .md-header__button.md-logo img,
 .md-header__button.md-logo svg {
-  height: 1.6rem;
+  height: calc(1.9 * var(--webis-font-size));
 }
 
-/* Font sizes follow webis.de: 14px text (Material's 1rem is 20px). */
 .md-header__title {
-  font-size: 0.84rem;
+  height: 3.5rem;
+  line-height: 3.5rem;
+  font-size: calc(1.02 * var(--webis-font-size));
+  font-weight: 400;
+  text-transform: uppercase;
 }
 
 .md-header__topic:first-child {
   font-weight: 400;
 }
 
-.md-tabs {
-  border-bottom: 1px solid var(--webis-dark-border);
+/* The header is higher than Material's, so sticky sidebars and anchors move. */
+.md-sidebar {
+  top: 3.5rem;
 }
 
-.md-tabs__link {
-  color: rgba(255, 255, 255, 0.5);
-  opacity: 1;
-  text-transform: uppercase;
-  letter-spacing: 0.02em;
+.md-typeset :target {
+  --md-scroll-margin: 4.7rem;
 }
 
-.md-tabs__link:hover,
-.md-tabs__link:focus {
+/* Site name and navigation links, like the links of the webis.de navbar. */
+[dir] .webis-header .md-header__title {
+  flex-grow: 0;
+  margin-left: 0.25em;
+  margin-right: 0.75rem;
+}
+
+.webis-header__site-name,
+.webis-header__nav-link {
   color: rgba(255, 255, 255, 0.75);
+  text-decoration: none;
+  transition: color 0.1s ease-in-out;
 }
 
-.md-tabs__item--active .md-tabs__link {
+.webis-header__site-name:hover,
+.webis-header__site-name:focus {
   color: #ffffff;
 }
 
+.webis-header__nav {
+  display: none;
+  gap: 0.75rem;
+  margin: 0 0 0 auto;
+  padding: 0;
+  list-style: none;
+}
+
+@media screen and (min-width: 76.25em) {
+  .webis-header__nav {
+    display: flex;
+  }
+
+  /* Pushes the navigation to the right, like on webis.de. */
+  [dir] .webis-header .md-header__title {
+    margin-right: 0;
+  }
+}
+
+/* Without the navigation, palette, repository, and search go to the right. */
+.webis-header .md-header__title + .md-header__option,
+.webis-header .md-header__title + .webis-header__source {
+  margin-left: auto;
+}
+
+@media screen and (max-width: 76.234375em) {
+  .webis-header .md-header__option:first-of-type {
+    margin-left: auto;
+  }
+}
+
+.webis-header__nav-item {
+  display: flex;
+  align-items: center;
+}
+
+.webis-header__nav-link {
+  color: rgba(255, 255, 255, 0.75);
+  font-size: calc(1.02 * var(--webis-font-size));
+  line-height: 3.5rem;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.webis-header__nav-link:hover,
+.webis-header__nav-link:focus {
+  color: #ffffff;
+}
+
+.webis-header__nav-item--active .webis-header__nav-link {
+  color: #ffffff;
+  text-decoration: underline;
+  text-underline-position: under;
+}
+
+.webis-header__nav + .md-header__option,
+.webis-header__nav + .webis-header__source {
+  margin-left: 0.75rem;
+}
+
+/* Small icon buttons: palette toggle and repository (icon only). */
+.webis-header .md-header__button.md-icon {
+  margin: 0.2rem 0.1rem;
+  padding: 0.3rem;
+}
+
+.webis-header .md-header__button.md-icon svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+.webis-header__source {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.webis-header__source:hover,
+.webis-header__source:focus {
+  color: #ffffff;
+}
+
+/* Compact search box at the end of the header line. */
 .md-search__form {
   border-radius: 0;
   background-color: rgba(255, 255, 255, 0.1);
@@ -194,12 +346,99 @@ body {
   background-color: rgba(255, 255, 255, 0.15);
 }
 
+@media screen and (min-width: 60em) {
+  .webis-header .md-search {
+    margin-left: 0.4rem;
+  }
+
+  .webis-header .md-search__inner {
+    width: 8rem;
+  }
+
+  [data-md-toggle="search"]:checked ~ .webis-header .md-search__inner {
+    width: 20rem;
+  }
+
+  .webis-header .md-search__form {
+    height: 1.5rem;
+  }
+
+  .webis-header .md-search__input,
+  .webis-header .md-search__suggest {
+    font-size: 0.7rem;
+  }
+
+  [dir="ltr"] .webis-header .md-search__input,
+  [dir="ltr"] .webis-header .md-search__suggest {
+    padding-left: 1.8rem;
+  }
+
+  [dir="rtl"] .webis-header .md-search__input,
+  [dir="rtl"] .webis-header .md-search__suggest {
+    padding-right: 1.8rem;
+  }
+
+  .webis-header .md-search__icon[for="__search"] {
+    top: 0.2rem;
+  }
+
+  [dir="ltr"] .webis-header .md-search__icon[for="__search"] {
+    left: 0.4rem;
+  }
+
+  [dir="rtl"] .webis-header .md-search__icon[for="__search"] {
+    right: 0.4rem;
+  }
+
+  .webis-header .md-search__icon svg {
+    width: 1rem;
+    height: 1rem;
+  }
+
+  .webis-header .md-search__options {
+    top: 0.15rem;
+  }
+
+  .webis-header .md-search__output {
+    top: 1.5rem;
+  }
+}
+
+/* Material's tabs, if the Webis header is disabled (header: false). */
+.md-tabs {
+  border-bottom: 1px solid var(--webis-dark-border);
+}
+
+.md-tabs__link {
+  color: rgba(255, 255, 255, 0.75);
+  opacity: 1;
+  font-size: calc(1.02 * var(--webis-font-size));
+  text-transform: uppercase;
+}
+
+.md-tabs__link:hover,
+.md-tabs__link:focus {
+  color: #ffffff;
+}
+
+.md-tabs__item--active .md-tabs__link {
+  color: #ffffff;
+  text-decoration: underline;
+  text-underline-position: under;
+}
+
+@media screen and (min-width: 76.25em) {
+  body:has(.md-tabs) .md-header {
+    border-bottom: none;
+  }
+}
+
 /* ------------------------------------------------------------------------
  * Navigation sidebars: gray links, the current page in black.
  * --------------------------------------------------------------------- */
 
 .md-nav {
-  font-size: 0.6125rem;
+  font-size: calc(0.875 * var(--webis-font-size));
 }
 
 .md-nav__link--active,
@@ -213,8 +452,8 @@ body {
  * --------------------------------------------------------------------- */
 
 .md-typeset {
-  font-size: 0.7rem;
-  line-height: 1.6;
+  font-size: var(--webis-font-size);
+  line-height: var(--webis-line-height);
 }
 
 .md-typeset h1,
@@ -583,7 +822,7 @@ body {
 .md-footer-meta,
 .md-copyright,
 .md-social {
-  font-size: 0.6125rem;
+  font-size: calc(0.875 * var(--webis-font-size));
 }
 
 .md-footer-meta,

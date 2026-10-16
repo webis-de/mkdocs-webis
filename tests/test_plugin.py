@@ -15,7 +15,11 @@ BIBTEX = """@article{doe2020test,
 
 
 def _build(
-    tmp_path: Path, plugin_config: str, page: str = "# Home\n", theme: str = ""
+    tmp_path: Path,
+    plugin_config: str,
+    page: str = "# Home\n",
+    theme: str = "",
+    extra_config: str = "",
 ) -> Path:
     docs_dir = tmp_path / "docs"
     docs_dir.mkdir()
@@ -24,6 +28,7 @@ def _build(
     config_file = tmp_path / "mkdocs.yml"
     config_file.write_text(
         "site_name: Test\n"
+        f"{extra_config}"
         "theme:\n"
         "  name: material\n"
         f"{theme}"
@@ -46,6 +51,37 @@ def test_style_and_palette(tmp_path: Path) -> None:
     assert (site_dir / "assets" / "webis" / "webis-logo.png").is_file()
     assert "assets/webis/webis-logo.png" in html
     assert "assets/webis/favicon.png" in html
+
+
+def test_header(tmp_path: Path) -> None:
+    site_dir = _build(
+        tmp_path,
+        "",
+        theme="  features:\n    - navigation.tabs\n",
+        extra_config="repo_url: https://github.com/webis-de/mkdocs-webis\n",
+    )
+    html = (site_dir / "index.html").read_text()
+    assert 'class="md-header md-header--shadow webis-header"' in html
+    assert 'class="webis-header__nav-link"' in html
+    assert 'class="md-tabs"' not in html
+    # Order: navigation, palette toggle, repository icon (then search, if enabled).
+    positions = [
+        html.index("webis-header__nav"),
+        html.index('data-md-component="palette"'),
+        html.index("webis-header__source"),
+    ]
+    assert positions == sorted(positions)
+
+
+def test_no_header(tmp_path: Path) -> None:
+    site_dir = _build(
+        tmp_path,
+        ":\n      header: false",
+        theme="  features:\n    - navigation.tabs\n",
+    )
+    html = (site_dir / "index.html").read_text()
+    assert "webis-header" not in html
+    assert 'class="md-tabs"' in html
 
 
 def test_google_fonts(tmp_path: Path) -> None:

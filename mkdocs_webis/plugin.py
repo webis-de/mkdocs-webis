@@ -44,6 +44,8 @@ class WebisPluginConfig(base.Config):
     """Use the Webis light and dark color schemes for the Material theme."""
     google_fonts = config_options.Type(bool, default=False)
     """Load Noto Sans from Google Fonts (otherwise, only use installed fonts)."""
+    header = config_options.Type(bool, default=True)
+    """Show the navigation, search, and repository link in the header line."""
     logo = config_options.Type(bool, default=True)
     """Use the Webis logo and favicon, unless the theme configures its own."""
     bibliography = config_options.Optional(config_options.Type(str))
@@ -75,6 +77,12 @@ class WebisPlugin(BasePlugin[WebisPluginConfig]):
         else:
             if self.config.palette:
                 theme["palette"] = _PALETTE
+            if self.config.header:
+                # After the user's custom_dir, so that it can still override templates.
+                templates_dir = str(files("mkdocs_webis").joinpath("templates"))
+                if templates_dir not in theme.dirs:
+                    index = 1 if theme.custom_dir else 0
+                    theme.dirs.insert(index, templates_dir)
             # Like webis.de, prefer Product Sans and Noto Sans (see the stylesheet).
             theme["font"] = dict(_GOOGLE_FONTS) if self.config.google_fonts else False
             if self.config.logo:

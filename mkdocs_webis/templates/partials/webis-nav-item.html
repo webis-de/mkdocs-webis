@@ -1,0 +1,22 @@
+{#- Top-level navigation item in the Webis header. -#}
+{% macro render(nav_item, ref) %}
+  {% set ref = ref or nav_item %}
+  {% set class = "webis-header__nav-item" %}
+  {% if ref.active %}
+    {% set class = class ~ " webis-header__nav-item--active" %}
+  {% endif %}
+  {% if nav_item.children %}
+    {% set first = nav_item.children | first %}
+    {% if first.children %}
+      {{ render(first, ref) }}
+    {% else %}
+      <li class="{{ class }}">
+        <a href="{{ first.url | url }}" class="webis-header__nav-link">{{ ref.title }}</a>
+      </li>
+    {% endif %}
+  {% else %}
+    <li class="{{ class }}">
+      <a href="{{ nav_item.url | url }}" class="webis-header__nav-link">{{ ref.title }}</a>
+    </li>
+  {% endif %}
+{% endmacro %}
