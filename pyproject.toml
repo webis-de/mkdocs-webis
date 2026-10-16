@@ -1,0 +1,84 @@
+[project]
+name = "mkdocs-webis"
+authors = [
+    { name = "Jan Heinrich Merker", email = "heinrich.merker@uni-jena.de" },
+]
+description = "Webis style and BibTeX citations for MkDocs Material."
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
+requires-python = ">=3.11"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Operating System :: OS Independent",
+    "Framework :: MkDocs",
+    "Intended Audience :: Science/Research",
+    "Topic :: Documentation",
+]
+dependencies = [
+    "mkdocs~=1.6",  # MkDocs 2.0 will drop support for plugins and themes.
+    "mkdocs-material~=9.6",
+]
+dynamic = ["version"]
+
+[project.optional-dependencies]
+tests = [
+    "bandit[toml]~=1.8",
+    "mypy>=1.13,<3.0",
+    "pytest>=8.3,<10.0",
+    "pytest-cov>=6.3,<8.0",
+    "ruff>=0.12.7,<0.15.0",
+]
+
+[project.entry-points."mkdocs.plugins"]
+webis = "mkdocs_webis.plugin:WebisPlugin"
+
+[project.urls]
+"Homepage" = "https://github.com/webis-de/mkdocs-webis"
+"Bug Tracker" = "https://github.com/webis-de/mkdocs-webis/issues"
+
+[build-system]
+requires = ["setuptools>=80.9,<85.0", "setuptools-scm>=8,<10"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+exclude = ["build", "venv", "tests"]
+
+[tool.setuptools.package-data]
+mkdocs_webis = ["assets/*", "py.typed"]
+
+[tool.setuptools_scm]
+
+[tool.ruff]
+exclude = ["build", "venv"]
+
+[tool.ruff.lint]
+select = [
+    "E4",
+    "E7",
+    "E9",
+    "F",
+    "S",  # Security issues
+    "UP", # Up-to-date syntax
+]
+
+[tool.ruff.lint.per-file-ignores]
+"**/test_*.py" = ["S101"]
+
+[tool.mypy]
+exclude = ["build", "venv"]
+ignore_missing_imports = true
+
+[tool.bandit]
+exclude_dirs = ["build", "venv"]
+
+[tool.bandit.assert_used]
+skips = ["**/test_*.py"]
+
+[tool.pytest.ini_options]
+log_cli = true
