@@ -569,48 +569,6 @@ body {
 }
 
 /* ------------------------------------------------------------------------
- * Hero: a dark box with white text, like the cover of webis.de.
- * --------------------------------------------------------------------- */
-
-.md-typeset .hero {
-  padding: 2.5rem 1.6rem 1.6rem;
-  margin: 0 0 2rem;
-  background: linear-gradient(to bottom, #4a4a4a 0%, var(--webis-dark) 70%);
-  color: #ffffff;
-}
-
-.md-typeset .hero h1 {
-  margin: 0 0 0.4em;
-  color: #ffffff;
-  font-size: 2.65em;
-  line-height: 1.2;
-}
-
-.md-typeset .hero p {
-  margin: 0.6em 0;
-  color: rgba(255, 255, 255, 0.85);
-}
-
-.md-typeset .hero .subtitle {
-  margin-top: 0;
-  color: rgba(255, 255, 255, 0.7);
-}
-
-.md-typeset .hero a:not(.md-button) {
-  color: #ffffff;
-  text-decoration: underline;
-}
-
-.md-typeset .hero .md-button:not(.md-button--primary) {
-  border-color: rgba(255, 255, 255, 0.4);
-  color: #ffffff;
-}
-
-.md-typeset .hero .md-button:not(.md-button--primary):hover {
-  border-color: #ffffff;
-}
-
-/* ------------------------------------------------------------------------
  * Footer: light gray, with small gray text.
  * --------------------------------------------------------------------- */
 
