@@ -18,6 +18,8 @@ This MkDocs plugin...
 - ... styles your documentation like the [Webis homepage](https://webis.de/) (a dark gray navigation bar with the Webis logo, the "Product Sans" and "Noto Sans" fonts, plain headings, blue links and buttons, flat tables, and a light gray footer), in a light and a dark color scheme,
 - ... lets you cite references from a BibTeX file with `[@key]` or `[@key1, @key2]`, rendered as gray author–year citations like "[Fang et al., 2004]", and appends a list of the cited references (including their BibTeX) to each page.
 
+The [documentation](https://webis-de.github.io/mkdocs-webis/) is rendered with the plugin itself, so it doubles as a demo.
+
 ## Installation
 
 Install the package from PyPI:
@@ -82,6 +84,7 @@ Besides styling the standard Material elements, the stylesheet provides a few CS
 ```
 
 The colors of webis.de are available as CSS variables (e.g., `var(--webis-blue)`, `var(--webis-red)`) for your own stylesheets.
+See the [style elements](https://webis-de.github.io/mkdocs-webis/style/) for how all elements look.
 
 ## Development
 
@@ -112,6 +115,15 @@ pytest .      # Unit tests
 ```
 
 Please also add tests for your newly developed code.
+
+### Documentation and demo
+
+The documentation in [`docs/`](docs/) uses the plugin itself, including a [page with all style elements](docs/style.md) and [citations](docs/citations.md).
+Preview it locally to check changes to the style or the citations:
+
+```shell
+mkdocs serve
+```
 
 ### Build wheels
 

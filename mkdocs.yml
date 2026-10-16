@@ -1,0 +1,69 @@
+site_name: mkdocs-webis
+site_description: Webis style and BibTeX citations for MkDocs Material.
+site_url: https://webis-de.github.io/mkdocs-webis/
+site_author: Webis Group
+repo_url: https://github.com/webis-de/mkdocs-webis
+repo_name: webis-de/mkdocs-webis
+edit_uri: edit/main/docs/
+copyright: >-
+  &copy; <a href="https://webis.de/">Webis Group</a> ·
+  Released under the <a href="https://github.com/webis-de/mkdocs-webis/blob/main/LICENSE">MIT license</a>
+
+docs_dir: docs
+validation:
+  omitted_files: warn
+  absolute_links: warn
+  unrecognized_links: warn
+  anchors: warn
+
+theme:
+  name: material
+  language: en
+  icon:
+    repo: fontawesome/brands/github
+  features:
+    - content.code.copy
+    - content.tabs.link
+    - navigation.footer
+    - navigation.tabs
+    - navigation.top
+    - search.highlight
+    - toc.follow
+
+plugins:
+  - search
+  - webis:
+      bibliography: references.bib
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - def_list
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+  - pymdownx.details
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - pymdownx.highlight
+  - pymdownx.inlinehilite
+  - pymdownx.mark
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/webis-de/mkdocs-webis
+    - icon: fontawesome/brands/python
+      link: https://pypi.org/project/mkdocs-webis/
+    - icon: material/web
+      link: https://webis.de/
+
+nav:
+  - Home: index.md
+  - Citations: citations.md
+  - Style Elements: style.md
