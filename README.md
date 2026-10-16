@@ -15,9 +15,8 @@ Webis style and BibTeX citations for [MkDocs Material](https://squidfunk.github.
 
 This MkDocs plugin...
 
-- ... styles your documentation with the colors and rough design of the [Webis lecture notes](https://downloads.webis.de/lecturenotes/lecturenotes-generic/unit-en-lecturenotes-tutorial.pdf) (bold black titles, dark blue subtitles, square bullets, booktabs-like tables, and yellow highlight boxes), in a light and a dark color scheme,
-- ... uses the system's Helvetica-like fonts instead of loading fonts from Google,
-- ... lets you cite references from a BibTeX file with `[@key]`, and appends a list of the cited references (including their BibTeX) to each page.
+- ... styles your documentation like the [Webis homepage](https://webis.de/) (a dark gray navigation bar with the Webis logo, the "Product Sans" and "Noto Sans" fonts, plain headings, blue links and buttons, flat tables, and a light gray footer), in a light and a dark color scheme,
+- ... lets you cite references from a BibTeX file with `[@key]` or `[@key1, @key2]`, rendered as gray author–year citations like "[Fang et al., 2004]", and appends a list of the cited references (including their BibTeX) to each page.
 
 ## Installation
 
@@ -47,10 +46,11 @@ plugins:
 | :-- | :-- | :-- |
 | `style` | `true` | Add the Webis stylesheet. |
 | `palette` | `true` | Use the Webis light (`webis`) and dark (`webis-dark`) color schemes, with a toggle. Set to `false` to configure `theme.palette` yourself. |
-| `system_fonts` | `true` | Use the system's Helvetica-like fonts instead of Google Fonts. |
+| `google_fonts` | `false` | Load Noto Sans from Google Fonts. By default, like webis.de, only installed fonts are used ("Product Sans", "Noto Sans", or Verdana). |
+| `logo` | `true` | Use the Webis logo and favicon, unless `theme.logo` or `theme.favicon` are set. |
 | `bibliography` | — | Path of a BibTeX file, relative to the docs directory. Enables citations. |
 | `references_heading` | `References` | Heading of the references section appended to pages with citations. |
-| `show_bibtex` | `true` | Show the BibTeX of each reference in a collapsible block. |
+| `show_bibtex` | `true` | Add a "[bib]" link to each reference that shows its BibTeX. |
 
 ### Citations
 
@@ -58,15 +58,16 @@ With a `bibliography` configured, cite references by their BibTeX keys:
 
 ```markdown
 Axioms are formal constraints on retrieval models [@fang2004formal].
-Several studies use axioms to re-rank results [@hagen2016axiomatic; @bondarenko2022axiomatic].
+Several studies use axioms to re-rank results [@hagen2016axiomatic, @bondarenko2022axiomatic].
 ```
 
-Citations are rendered as author–year links (e.g., "(Fang et al., 2004)") to a "References" section at the bottom of the same page, which lists all references cited on that page.
-Citations inside code are not replaced, and unknown keys fail the build.
-The collapsible BibTeX blocks need the `admonition`, `pymdownx.details`, and `pymdownx.superfences` Markdown extensions.
+Citations are rendered as gray author–year links in brackets (e.g., "[Fang et al., 2004]" or "[Hagen et al., 2016; Bondarenko et al., 2022]"), like on the Webis slides.
+They link to a "References" section at the bottom of the same page, which lists all references cited on that page.
+Multiple keys are separated by commas (semicolons work, too).
+Citations inside code are not replaced, and unknown keys or invalid BibTeX fail the build.
+BibTeX files are parsed with [bibtexparser](https://github.com/sciunto-org/python-bibtexparser), and LaTeX markup in the fields is converted to plain text with [pylatexenc](https://github.com/phfaist/pylatexenc).
 
 We recommend copying BibTeX entries from [DBLP](https://dblp.org/).
-All fields must be enclosed in braces (`title = {...}`), as in DBLP's export.
 
 ### Style Elements
 
@@ -75,16 +76,12 @@ Besides styling the standard Material elements, the stylesheet provides a few CS
 ```markdown
 # Page Title
 
-<p class="subtitle">A subtitle in dark blue, like on the slides.</p>
+<p class="subtitle">A gray subtitle below the page title.</p>
 
-<span class="badge">TFC1</span> — a boxed label, e.g., for names or acronyms.
-
-<div class="hero" markdown>
-A highlighted introduction box, e.g., for the home page.
-</div>
+<span class="badge">TFC1</span> — a small label, e.g., for names or acronyms.
 ```
 
-The color palette is available as CSS variables (e.g., `var(--webis-blue-ld)`, `var(--webis-red-tl1)`) for your own stylesheets.
+The colors of webis.de are available as CSS variables (e.g., `var(--webis-blue)`, `var(--webis-red)`) for your own stylesheets.
 
 ## Development
 
@@ -109,10 +106,9 @@ pip install -e .[tests]
 Verify your changes against the test suite to verify.
 
 ```shell
-ruff check .                   # Code format and LINT
-mypy .                         # Static typing
-bandit -c pyproject.toml -r .  # Security
-pytest .                       # Unit tests
+ruff check .  # Code format, LINT, and security
+mypy .        # Static typing
+pytest .      # Unit tests
 ```
 
 Please also add tests for your newly developed code.
