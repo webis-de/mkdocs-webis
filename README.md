@@ -22,7 +22,7 @@ The [documentation](https://webis-de.github.io/mkdocs-webis/) is rendered with t
 
 ## Installation
 
-Install the package from PyPI:
+Install the package from [PyPI](https://pypi.org/project/mkdocs-webis/):
 
 ```shell
 pip install mkdocs-webis

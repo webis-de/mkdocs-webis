@@ -11,6 +11,7 @@ This documentation is rendered with the plugin itself, so it doubles as a demo o
 
 [Get started](#installation){ .md-button .md-button--primary }
 [View on GitHub](https://github.com/webis-de/mkdocs-webis){ .md-button }
+[View on PyPI](https://pypi.org/project/mkdocs-webis/){ .md-button }
 
 This MkDocs plugin...
 
@@ -19,7 +20,7 @@ This MkDocs plugin...
 
 ## Installation
 
-Install the package from PyPI:
+Install the package from [PyPI](https://pypi.org/project/mkdocs-webis/):
 
 ```shell
 pip install mkdocs-webis
