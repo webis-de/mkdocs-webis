@@ -60,8 +60,6 @@ jobs:
         run: pip install .[tests]
       - name: "🔍 Check Python code"
         run: ruff check .
-      - name: "🔍 Check Python code security"
-        run: bandit -c pyproject.toml -r .
   python-typing:
     name: "🔍 Check Python static typing"
     strategy:

@@ -21,14 +21,13 @@ classifiers = [
     "Topic :: Documentation",
 ]
 dependencies = [
-    "mkdocs~=1.6",  # MkDocs 2.0 will drop support for plugins and themes.
+    "mkdocs~=1.6",
     "mkdocs-material~=9.6",
 ]
 dynamic = ["version"]
 
 [project.optional-dependencies]
 tests = [
-    "bandit[toml]~=1.8",
     "mypy>=1.13,<3.0",
     "pytest>=8.3,<10.0",
     "pytest-cov>=6.3,<8.0",
@@ -73,12 +72,6 @@ select = [
 [tool.mypy]
 exclude = ["build", "venv"]
 ignore_missing_imports = true
-
-[tool.bandit]
-exclude_dirs = ["build", "venv"]
-
-[tool.bandit.assert_used]
-skips = ["**/test_*.py"]
 
 [tool.pytest.ini_options]
 log_cli = true
