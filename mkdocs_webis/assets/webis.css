@@ -1,632 +1,649 @@
 /*
  * Webis style for MkDocs Material (mkdocs-webis).
  *
- * Colors and rough design follow the Webis lecture notes style guide
- * (https://downloads.webis.de/lecturenotes/lecturenotes-generic/unit-en-lecturenotes-tutorial.pdf):
- * white slides, bold black titles, subtitles in webisblueLD, square list bullets,
- * booktabs-like tables, ultralightyellow highlight boxes, and gray footers.
+ * Follows the style of the Webis homepage (https://webis.de/): a dark gray
+ * navigation bar with the Webis logo and uppercase links, "Product Sans" and
+ * "Noto Sans" fonts, plain headings, blue links and buttons, flat tables with
+ * thin row dividers, and a light gray footer.
  */
 
 :root {
-  /* Webis palette (A1–A3: fills, TL1–TL2: text and lines, LD: dark text). */
-  --webis-blue-a1: #d3f8f7;
-  --webis-blue-a2: #90d7de;
-  --webis-blue-a3: #68b4c2;
-  --webis-blue-tl1: #3a91a5;
-  --webis-blue-tl2: #156a82;
-  --webis-blue-ld: #034257;
-  --webis-green-a1: #e6f8b8;
-  --webis-green-a2: #9ed977;
-  --webis-green-a3: #62ba61;
-  --webis-green-tl1: #349850;
-  --webis-green-tl2: #12753e;
-  --webis-green-ld: #02522b;
-  --webis-red-a1: #ffdfdb;
-  --webis-red-a2: #ffab9e;
-  --webis-red-a3: #ff6f52;
-  --webis-red-tl1: #e64727;
-  --webis-red-tl2: #9e3723;
-  --webis-red-ld: #5b181b;
-  --webis-purple-a1: #f5defc;
-  --webis-purple-a2: #d6acfa;
-  --webis-purple-a3: #bb86f3;
-  --webis-purple-tl1: #9951e6;
-  --webis-purple-tl2: #6d34a7;
-  --webis-purple-ld: #3e235d;
-  --webis-yellow-a1: #ffec99;
-  --webis-yellow-a2: #ffc640;
-  --webis-yellow-a3: #e8a01d;
-  --webis-yellow-tl1: #c78824;
-  --webis-yellow-tl2: #a16628;
-  --webis-yellow-ld: #835327;
-  /* Additional colors. */
-  --webis-ultralightgray: #e6e6e6;
-  --webis-lightgray: #cccccc;
-  --webis-mediumgray: #999999;
-  --webis-darkgray: #666666;
-  --webis-ultralightyellow: #fffade;
-  --webis-lightyellow: #fff7b3;
-
-  --md-text-font-family: "Helvetica Neue", Helvetica, Arial, "Nimbus Sans",
-    "Nimbus Sans L", "Liberation Sans", sans-serif;
-  --md-code-font-family: ui-monospace, "SFMono-Regular", Menlo, Consolas,
-    "Liberation Mono", "Nimbus Mono PS", monospace;
+  /* Colors of webis.de. */
+  --webis-dark: #323232;
+  --webis-dark-border: #727272;
+  --webis-text: #222222;
+  --webis-heading: #333333;
+  --webis-muted: #666666;
+  --webis-muted-bg: #f8f8f8;
+  --webis-border: #e5e5e5;
+  --webis-border-strong: #b2b2b2;
+  --webis-link: #0645ad;
+  --webis-blue: #1e87f0;
+  --webis-blue-dark: #0f7ae5;
+  --webis-green: #32d296;
+  --webis-orange: #faa05a;
+  --webis-red: #f0506e;
 }
 
-/* Light scheme: white "slides" with dark blue accents. */
+body {
+  /* Like webis.de, use Product Sans or Noto Sans if installed (or loaded). */
+  --md-text-font-family: "Product Sans", var(--md-text-font, "Noto Sans"),
+    "Noto Sans", Verdana, sans-serif;
+  --md-code-font-family: Consolas, var(--md-code-font, monaco), monaco,
+    monospace;
+}
+
+/* Light scheme: the colors of webis.de. */
 [data-md-color-scheme="webis"] {
   color-scheme: light;
 
-  --md-default-fg-color: rgba(0, 0, 0, 0.87);
-  --md-default-fg-color--light: rgba(0, 0, 0, 0.6);
-  --md-default-fg-color--lighter: rgba(0, 0, 0, 0.32);
-  --md-default-fg-color--lightest: rgba(0, 0, 0, 0.07);
+  --md-default-fg-color: var(--webis-text);
+  --md-default-fg-color--light: var(--webis-muted);
+  --md-default-fg-color--lighter: #999999;
+  --md-default-fg-color--lightest: var(--webis-border);
   --md-default-bg-color: #ffffff;
 
-  --md-primary-fg-color: #ffffff;
-  --md-primary-fg-color--light: #ffffff;
-  --md-primary-fg-color--dark: var(--webis-blue-ld);
-  --md-primary-bg-color: #000000;
-  --md-primary-bg-color--light: rgba(0, 0, 0, 0.6);
+  --md-primary-fg-color: var(--webis-dark);
+  --md-primary-fg-color--light: var(--webis-dark);
+  --md-primary-fg-color--dark: var(--webis-dark);
+  --md-primary-bg-color: #ffffff;
+  --md-primary-bg-color--light: rgba(255, 255, 255, 0.7);
 
-  --md-accent-fg-color: var(--webis-red-tl1);
-  --md-accent-fg-color--transparent: rgba(230, 71, 39, 0.1);
+  --md-accent-fg-color: var(--webis-blue);
+  --md-accent-fg-color--transparent: rgba(30, 135, 240, 0.1);
   --md-accent-bg-color: #ffffff;
 
-  --md-typeset-color: #000000;
-  --md-typeset-a-color: var(--webis-blue-tl2);
-  --md-typeset-mark-color: var(--webis-lightyellow);
+  --md-typeset-color: var(--webis-text);
+  --md-typeset-a-color: var(--webis-link);
+  --md-typeset-mark-color: #ffffdd;
 
-  --webis-heading-color: var(--webis-blue-ld);
-  --webis-rule-color: var(--webis-blue-ld);
-  --webis-highlight-bg: var(--webis-ultralightyellow);
+  --webis-heading-color: var(--webis-heading);
+  --webis-rule-color: var(--webis-border);
+  --webis-surface-color: var(--webis-muted-bg);
 
-  --md-code-fg-color: var(--webis-blue-ld);
-  --md-code-bg-color: #f7f7f5;
-  --md-code-hl-color: var(--webis-yellow-a1);
-  --md-code-hl-keyword-color: var(--webis-purple-tl2);
-  --md-code-hl-function-color: var(--webis-blue-tl2);
-  --md-code-hl-string-color: var(--webis-green-tl2);
-  --md-code-hl-number-color: var(--webis-red-tl2);
-  --md-code-hl-constant-color: var(--webis-red-tl2);
-  --md-code-hl-special-color: var(--webis-red-tl1);
+  --md-code-fg-color: #454545;
+  --md-code-bg-color: var(--webis-muted-bg);
+  --md-code-hl-color: rgba(255, 255, 221, 1);
+  --md-code-hl-keyword-color: #0645ad;
+  --md-code-hl-function-color: #1c79cc;
+  --md-code-hl-string-color: #1f8a5e;
+  --md-code-hl-number-color: #c4621b;
+  --md-code-hl-constant-color: #c4621b;
+  --md-code-hl-special-color: #d42f50;
   --md-code-hl-name-color: var(--md-code-fg-color);
-  --md-code-hl-operator-color: var(--webis-darkgray);
-  --md-code-hl-punctuation-color: var(--webis-darkgray);
-  --md-code-hl-comment-color: var(--webis-blue-tl1);
-  --md-code-hl-generic-color: var(--webis-darkgray);
-  --md-code-hl-variable-color: var(--webis-blue-ld);
+  --md-code-hl-operator-color: var(--webis-muted);
+  --md-code-hl-punctuation-color: var(--webis-muted);
+  --md-code-hl-comment-color: #999999;
+  --md-code-hl-generic-color: var(--webis-muted);
+  --md-code-hl-variable-color: #411ef0;
 
-  --md-footer-fg-color: #000000;
-  --md-footer-fg-color--light: var(--webis-darkgray);
-  --md-footer-fg-color--lighter: var(--webis-mediumgray);
-  --md-footer-bg-color: #ffffff;
-  --md-footer-bg-color--dark: #ffffff;
+  --md-footer-fg-color: var(--webis-text);
+  --md-footer-fg-color--light: var(--webis-muted);
+  --md-footer-fg-color--lighter: #999999;
+  --md-footer-bg-color: var(--webis-muted-bg);
+  --md-footer-bg-color--dark: var(--webis-muted-bg);
 }
 
-/* Dark scheme: the same palette, using the light fills for text. */
+/* Dark scheme: the dark gray of the webis.de navigation bar, everywhere. */
 [data-md-color-scheme="webis-dark"] {
   color-scheme: dark;
 
-  --md-default-fg-color: rgba(255, 255, 255, 0.87);
+  --md-default-fg-color: rgba(255, 255, 255, 0.85);
   --md-default-fg-color--light: rgba(255, 255, 255, 0.6);
-  --md-default-fg-color--lighter: rgba(255, 255, 255, 0.32);
-  --md-default-fg-color--lightest: rgba(255, 255, 255, 0.08);
-  --md-default-bg-color: #101a1f;
+  --md-default-fg-color--lighter: rgba(255, 255, 255, 0.35);
+  --md-default-fg-color--lightest: rgba(255, 255, 255, 0.12);
+  --md-default-bg-color: #222222;
 
-  --md-primary-fg-color: #101a1f;
-  --md-primary-fg-color--light: #101a1f;
-  --md-primary-fg-color--dark: var(--webis-blue-a2);
+  --md-primary-fg-color: var(--webis-dark);
+  --md-primary-fg-color--light: var(--webis-dark);
+  --md-primary-fg-color--dark: var(--webis-dark);
   --md-primary-bg-color: #ffffff;
-  --md-primary-bg-color--light: rgba(255, 255, 255, 0.6);
+  --md-primary-bg-color--light: rgba(255, 255, 255, 0.7);
 
-  --md-accent-fg-color: var(--webis-red-a3);
-  --md-accent-fg-color--transparent: rgba(255, 111, 82, 0.12);
-  --md-accent-bg-color: #101a1f;
+  --md-accent-fg-color: #4aa1f3;
+  --md-accent-fg-color--transparent: rgba(74, 161, 243, 0.12);
+  --md-accent-bg-color: #222222;
 
-  --md-typeset-color: rgba(255, 255, 255, 0.9);
-  --md-typeset-a-color: var(--webis-blue-a2);
-  --md-typeset-mark-color: rgba(255, 198, 64, 0.3);
+  --md-typeset-color: rgba(255, 255, 255, 0.85);
+  --md-typeset-a-color: #7fb3f5;
+  --md-typeset-mark-color: rgba(250, 160, 90, 0.3);
 
-  --webis-heading-color: var(--webis-blue-a2);
-  --webis-rule-color: var(--webis-blue-a3);
-  --webis-highlight-bg: rgba(255, 236, 153, 0.08);
+  --webis-heading-color: #ffffff;
+  --webis-rule-color: rgba(255, 255, 255, 0.12);
+  --webis-surface-color: #2a2a2a;
 
-  --md-code-fg-color: var(--webis-blue-a1);
-  --md-code-bg-color: #17252c;
-  --md-code-hl-color: rgba(255, 198, 64, 0.2);
-  --md-code-hl-keyword-color: var(--webis-purple-a2);
-  --md-code-hl-function-color: var(--webis-blue-a2);
-  --md-code-hl-string-color: var(--webis-green-a2);
-  --md-code-hl-number-color: var(--webis-red-a2);
-  --md-code-hl-constant-color: var(--webis-red-a2);
-  --md-code-hl-special-color: var(--webis-red-a3);
+  --md-code-fg-color: #e5e5e5;
+  --md-code-bg-color: #2a2a2a;
+  --md-code-hl-color: rgba(250, 160, 90, 0.2);
+  --md-code-hl-keyword-color: #7fb3f5;
+  --md-code-hl-function-color: #8ec5ff;
+  --md-code-hl-string-color: var(--webis-green);
+  --md-code-hl-number-color: var(--webis-orange);
+  --md-code-hl-constant-color: var(--webis-orange);
+  --md-code-hl-special-color: var(--webis-red);
   --md-code-hl-name-color: var(--md-code-fg-color);
-  --md-code-hl-operator-color: var(--webis-lightgray);
-  --md-code-hl-punctuation-color: var(--webis-lightgray);
-  --md-code-hl-comment-color: var(--webis-blue-a3);
-  --md-code-hl-generic-color: var(--webis-lightgray);
-  --md-code-hl-variable-color: var(--webis-blue-a1);
+  --md-code-hl-operator-color: rgba(255, 255, 255, 0.6);
+  --md-code-hl-punctuation-color: rgba(255, 255, 255, 0.6);
+  --md-code-hl-comment-color: rgba(255, 255, 255, 0.45);
+  --md-code-hl-generic-color: rgba(255, 255, 255, 0.6);
+  --md-code-hl-variable-color: #b9a8ff;
 
-  --md-footer-fg-color: rgba(255, 255, 255, 0.87);
-  --md-footer-fg-color--light: var(--webis-lightgray);
-  --md-footer-fg-color--lighter: var(--webis-mediumgray);
-  --md-footer-bg-color: #101a1f;
-  --md-footer-bg-color--dark: #101a1f;
+  --md-footer-fg-color: rgba(255, 255, 255, 0.85);
+  --md-footer-fg-color--light: rgba(255, 255, 255, 0.6);
+  --md-footer-fg-color--lighter: rgba(255, 255, 255, 0.35);
+  --md-footer-bg-color: #2a2a2a;
+  --md-footer-bg-color--dark: #2a2a2a;
 }
 
 /* ------------------------------------------------------------------------
- * Header and navigation tabs: like a slide header with a colored rule.
+ * Header and navigation tabs: the dark gray navigation bar of webis.de.
  * --------------------------------------------------------------------- */
 
 .md-header {
   box-shadow: none;
-  border-bottom: 1px solid var(--md-default-fg-color--lightest);
+  border-bottom: 1px solid var(--webis-dark-border);
 }
 
-.md-header__title {
-  font-weight: 700;
-}
-
-.md-tabs {
-  background-color: var(--md-primary-fg-color);
-  color: var(--webis-heading-color);
-  border-bottom: 3px solid var(--webis-rule-color);
-}
-
-.md-tabs__link {
-  opacity: 0.85;
-  font-size: 0.75rem;
-}
-
-.md-tabs__link--active,
-.md-tabs__link:hover {
-  opacity: 1;
-  color: var(--md-accent-fg-color);
-}
-
-/* Without tabs (e.g., on small screens), draw the rule under the header. */
-@media screen and (max-width: 76.2344em) {
-  .md-header {
-    border-bottom: 3px solid var(--webis-rule-color);
+/* With tabs, the line is drawn below the tabs instead. */
+@media screen and (min-width: 76.25em) {
+  body:has(.md-tabs) .md-header {
+    border-bottom: none;
   }
 }
 
+.md-header__button.md-logo img,
+.md-header__button.md-logo svg {
+  height: 1.6rem;
+}
+
+/* Font sizes follow webis.de: 14px text (Material's 1rem is 20px). */
+.md-header__title {
+  font-size: 0.84rem;
+}
+
+.md-header__topic:first-child {
+  font-weight: 400;
+}
+
+.md-tabs {
+  border-bottom: 1px solid var(--webis-dark-border);
+}
+
+.md-tabs__link {
+  color: rgba(255, 255, 255, 0.5);
+  opacity: 1;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.md-tabs__link:hover,
+.md-tabs__link:focus {
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.md-tabs__item--active .md-tabs__link {
+  color: #ffffff;
+}
+
 .md-search__form {
-  background-color: var(--md-default-fg-color--lightest);
+  border-radius: 0;
+  background-color: rgba(255, 255, 255, 0.1);
 }
 
 .md-search__form:hover {
-  background-color: var(--md-default-fg-color--lightest);
+  background-color: rgba(255, 255, 255, 0.15);
 }
 
-[data-md-toggle="search"]:checked ~ .md-header .md-search__form {
-  background-color: var(--md-default-bg-color);
-}
+/* ------------------------------------------------------------------------
+ * Navigation sidebars: gray links, the current page in black.
+ * --------------------------------------------------------------------- */
 
-.md-search__input::placeholder,
-.md-search__icon {
-  color: var(--md-default-fg-color--light);
+.md-nav {
+  font-size: 0.6125rem;
 }
 
 .md-nav__link--active,
 .md-nav__item .md-nav__link--active {
-  color: var(--webis-heading-color);
+  color: var(--md-typeset-color);
   font-weight: 700;
 }
 
 /* ------------------------------------------------------------------------
- * Typography: bold black titles, blue subtitles (as on the slides).
+ * Typography: plain, normal-weight headings and blue links.
  * --------------------------------------------------------------------- */
 
 .md-typeset {
-  font-size: 0.8rem;
+  font-size: 0.7rem;
   line-height: 1.6;
 }
 
-.md-typeset h1 {
-  color: var(--md-typeset-color);
-  font-weight: 700;
-  letter-spacing: -0.01em;
-  margin-bottom: 0.4em;
-}
-
-.md-typeset h2 {
-  color: var(--webis-heading-color);
-  font-weight: 400;
-  letter-spacing: 0;
-}
-
-.md-typeset h3 {
-  color: var(--md-typeset-color);
-  font-weight: 700;
-}
-
+.md-typeset h1,
+.md-typeset h2,
+.md-typeset h3,
 .md-typeset h4,
 .md-typeset h5,
 .md-typeset h6 {
   color: var(--webis-heading-color);
-  font-weight: 700;
+  font-weight: 400;
+  letter-spacing: normal;
 }
 
-/* A subtitle directly below a page title, like "Standard Slide" below "Slide Examples". */
+.md-typeset h1 {
+  font-size: 2.625em;
+  line-height: 1.2;
+  margin: 0 0 0.6em;
+}
+
+.md-typeset h2 {
+  font-size: 1.7em;
+  line-height: 1.3;
+}
+
+.md-typeset h3 {
+  font-size: 1.2em;
+  line-height: 1.4;
+}
+
+/* Bold instead of webis.de's 1.25rem, so that h4 is not larger than h3. */
+.md-typeset h4,
+.md-typeset h5,
+.md-typeset h6 {
+  font-size: 1em;
+  line-height: 1.4;
+  font-weight: 700;
+  text-transform: none;
+}
+
+.md-typeset h6 {
+  font-size: 0.875em;
+}
+
+/* A subtitle directly below a page title. */
 .md-typeset .subtitle {
-  color: var(--webis-heading-color);
-  font-size: 1.15em;
-  margin-top: -0.6em;
+  color: var(--md-default-fg-color--light);
+  font-size: 1.2em;
+  margin-top: -0.8em;
 }
 
 .md-typeset a {
-  text-decoration: underline;
-  text-decoration-color: var(--md-default-fg-color--lighter);
-  text-underline-offset: 0.15em;
-}
-
-.md-typeset a:hover {
-  text-decoration-color: currentColor;
-}
-
-.md-typeset .headerlink,
-.md-typeset .md-button,
-.md-typeset .tabbed-labels a,
-.md-typeset .md-typeset__table a.headerlink {
   text-decoration: none;
 }
 
-/* Square bullets in the dark blue of the slides. */
-.md-typeset ul li::marker {
-  color: var(--webis-heading-color);
+.md-typeset a:hover,
+.md-typeset a:focus {
+  color: var(--md-typeset-a-color);
+  text-decoration: underline;
 }
 
-.md-typeset ul {
-  list-style-type: square;
+.md-typeset .headerlink:hover,
+.md-typeset .md-button:hover,
+.md-typeset .tabbed-labels a:hover {
+  text-decoration: none;
 }
 
-.md-typeset ul ul {
-  list-style-type: "– ";
+.md-typeset .headerlink:hover,
+.md-typeset .headerlink:focus {
+  color: var(--md-accent-fg-color);
 }
 
-.md-typeset ol li::marker {
-  color: var(--webis-heading-color);
+.md-typeset blockquote {
+  border-left-color: var(--webis-rule-color);
+  color: var(--md-default-fg-color--light);
 }
 
-/* Emphasized text in Webis red, keywords in Webis purple. */
-.md-typeset .em-color {
-  color: var(--webis-red-tl1);
-}
-
-.md-typeset .keyword-color {
-  color: var(--webis-purple-tl2);
-}
-
-[data-md-color-scheme="webis-dark"] .md-typeset .em-color {
-  color: var(--webis-red-a3);
-}
-
-[data-md-color-scheme="webis-dark"] .md-typeset .keyword-color {
-  color: var(--webis-purple-a2);
+.md-typeset hr {
+  border-bottom-color: var(--webis-rule-color);
 }
 
 /* ------------------------------------------------------------------------
- * Tables: booktabs style (top, mid, and bottom rules; no vertical lines).
+ * Citations and references.
+ * --------------------------------------------------------------------- */
+
+/* Gray citations in brackets, e.g., "[Fang et al., 2004]", as on the slides. */
+.md-typeset .citation {
+  color: var(--md-default-fg-color--light);
+}
+
+.md-typeset .citation a {
+  color: inherit;
+  white-space: nowrap;
+}
+
+.md-typeset .citation a:hover,
+.md-typeset .citation a:focus {
+  color: var(--md-accent-fg-color);
+}
+
+/* References: plain entries, like the publications list of webis.de. */
+.md-typeset .reference {
+  margin: 0 0 2.5ex;
+  line-height: 1.6;
+}
+
+.md-typeset .reference .venue {
+  font-style: italic;
+}
+
+.md-typeset .reference-links label {
+  color: var(--md-typeset-a-color);
+  cursor: pointer;
+}
+
+.md-typeset .reference-links label:hover {
+  text-decoration: underline;
+}
+
+/* The checkbox toggling the BibTeX is hidden, but stays keyboard-accessible. */
+.md-typeset .reference-toggle {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+.md-typeset .reference-toggle:focus-visible + .reference-links label {
+  outline: 2px solid var(--md-accent-fg-color);
+  outline-offset: 2px;
+}
+
+.md-typeset .reference-bibtex {
+  display: none;
+  margin: 0.6em 0 0;
+}
+
+.md-typeset .reference-toggle:checked ~ .reference-bibtex {
+  display: block;
+}
+
+/* ------------------------------------------------------------------------
+ * Tables: no outer border, thin row dividers, uppercase gray headers.
  * --------------------------------------------------------------------- */
 
 .md-typeset table:not([class]) {
+  font-size: 1em;
   border: none;
-  border-top: 2px solid var(--md-typeset-color);
-  border-bottom: 2px solid var(--md-typeset-color);
   border-radius: 0;
   box-shadow: none;
-  font-size: 0.75rem;
 }
 
 .md-typeset table:not([class]) th {
   background-color: transparent;
-  color: var(--md-typeset-color);
+  color: var(--md-default-fg-color--light);
+  font-size: 0.875em;
   font-weight: 700;
-  border-bottom: 1px solid var(--md-typeset-color);
+  text-transform: uppercase;
+  vertical-align: bottom;
+  border-bottom: 1px solid var(--webis-rule-color);
 }
 
 .md-typeset table:not([class]) td {
-  border-top: none;
+  border-top: 1px solid var(--webis-rule-color);
   vertical-align: top;
 }
 
+.md-typeset table:not([class]) tbody tr:first-child td {
+  border-top: none;
+}
+
+.md-typeset table:not([class]) th,
+.md-typeset table:not([class]) td {
+  padding: 0.8em 0.6em;
+}
+
 .md-typeset table:not([class]) tbody tr:hover {
-  background-color: var(--webis-highlight-bg);
+  background-color: var(--webis-surface-color);
   box-shadow: none;
 }
 
 /* ------------------------------------------------------------------------
- * Admonitions: flat boxes with Webis fills (no shadows, thin left rule).
+ * Admonitions: flat, lightly tinted boxes, like the alerts of webis.de.
  * --------------------------------------------------------------------- */
 
 .md-typeset .admonition,
 .md-typeset details {
-  border-width: 0 0 0 3px;
+  --webis-admonition-color: var(--md-default-fg-color--lighter);
+
+  border: none;
+  border-left: 3px solid var(--webis-admonition-color);
+  font-size: 1em;
   border-radius: 0;
   box-shadow: none;
-  font-size: 0.75rem;
+  background-color: color-mix(
+    in srgb,
+    var(--webis-admonition-color) 10%,
+    var(--md-default-bg-color)
+  );
 }
 
-.md-typeset .admonition-title,
-.md-typeset summary {
-  font-weight: 700;
+.md-typeset .admonition:focus-within,
+.md-typeset details:focus-within {
+  box-shadow: none;
 }
 
-/* note, abstract, info: ultralightyellow, like the highlighted slides. */
+.md-typeset .admonition > .admonition-title,
+.md-typeset details > summary {
+  background-color: transparent;
+  color: var(--md-typeset-color);
+}
+
+.md-typeset .admonition > .admonition-title::before,
+.md-typeset details > summary::before,
+.md-typeset details > summary::after {
+  background-color: var(--webis-admonition-color);
+}
+
 .md-typeset .admonition.note,
 .md-typeset details.note,
-.md-typeset .admonition.abstract,
-.md-typeset details.abstract,
 .md-typeset .admonition.info,
-.md-typeset details.info {
-  border-color: var(--webis-yellow-a3);
-  background-color: var(--webis-highlight-bg);
+.md-typeset details.info,
+.md-typeset .admonition.question,
+.md-typeset details.question {
+  --webis-admonition-color: var(--webis-blue);
 }
 
-.md-typeset .note > .admonition-title,
-.md-typeset .note > summary,
-.md-typeset .abstract > .admonition-title,
-.md-typeset .abstract > summary,
-.md-typeset .info > .admonition-title,
-.md-typeset .info > summary {
-  background-color: transparent;
-}
-
-.md-typeset .note > .admonition-title::before,
-.md-typeset .note > summary::before,
-.md-typeset .abstract > .admonition-title::before,
-.md-typeset .abstract > summary::before,
-.md-typeset .info > .admonition-title::before,
-.md-typeset .info > summary::before {
-  background-color: var(--webis-yellow-tl1);
-}
-
-/* tip, success, example: green. */
 .md-typeset .admonition.tip,
 .md-typeset details.tip,
 .md-typeset .admonition.success,
 .md-typeset details.success {
-  border-color: var(--webis-green-a3);
+  --webis-admonition-color: var(--webis-green);
 }
 
-.md-typeset .tip > .admonition-title,
-.md-typeset .tip > summary,
-.md-typeset .success > .admonition-title,
-.md-typeset .success > summary {
-  background-color: rgba(230, 248, 184, 0.45);
-}
-
-.md-typeset .tip > .admonition-title::before,
-.md-typeset .tip > summary::before,
-.md-typeset .success > .admonition-title::before,
-.md-typeset .success > summary::before {
-  background-color: var(--webis-green-tl1);
-}
-
-/* example, question: purple (keyword color). */
-.md-typeset .admonition.example,
-.md-typeset details.example,
-.md-typeset .admonition.question,
-.md-typeset details.question {
-  border-color: var(--webis-purple-a3);
-}
-
-.md-typeset .example > .admonition-title,
-.md-typeset .example > summary,
-.md-typeset .question > .admonition-title,
-.md-typeset .question > summary {
-  background-color: rgba(245, 222, 252, 0.5);
-}
-
-.md-typeset .example > .admonition-title::before,
-.md-typeset .example > summary::before,
-.md-typeset .question > .admonition-title::before,
-.md-typeset .question > summary::before {
-  background-color: var(--webis-purple-tl1);
-}
-
-/* warning: yellow; danger, failure, bug: red (emphasis color). */
 .md-typeset .admonition.warning,
 .md-typeset details.warning {
-  border-color: var(--webis-yellow-a2);
+  --webis-admonition-color: var(--webis-orange);
 }
 
-.md-typeset .warning > .admonition-title,
-.md-typeset .warning > summary {
-  background-color: rgba(255, 236, 153, 0.45);
-}
-
-.md-typeset .warning > .admonition-title::before,
-.md-typeset .warning > summary::before {
-  background-color: var(--webis-yellow-tl2);
-}
-
-.md-typeset .admonition.danger,
-.md-typeset details.danger,
 .md-typeset .admonition.failure,
 .md-typeset details.failure,
+.md-typeset .admonition.danger,
+.md-typeset details.danger,
 .md-typeset .admonition.bug,
 .md-typeset details.bug {
-  border-color: var(--webis-red-tl1);
+  --webis-admonition-color: var(--webis-red);
 }
 
-.md-typeset .danger > .admonition-title,
-.md-typeset .danger > summary,
-.md-typeset .failure > .admonition-title,
-.md-typeset .failure > summary,
-.md-typeset .bug > .admonition-title,
-.md-typeset .bug > summary {
-  background-color: rgba(255, 223, 219, 0.5);
-}
-
-.md-typeset .danger > .admonition-title::before,
-.md-typeset .danger > summary::before,
-.md-typeset .failure > .admonition-title::before,
-.md-typeset .failure > summary::before,
-.md-typeset .bug > .admonition-title::before,
-.md-typeset .bug > summary::before {
-  background-color: var(--webis-red-tl1);
-}
-
-/* quote (used for BibTeX blocks): gray, like secondary slide text. */
+/* abstract, example, and quote (used for BibTeX blocks): gray. */
+.md-typeset .admonition.abstract,
+.md-typeset details.abstract,
+.md-typeset .admonition.example,
+.md-typeset details.example,
 .md-typeset .admonition.quote,
 .md-typeset details.quote {
-  border-color: var(--webis-lightgray);
+  --webis-admonition-color: var(--md-default-fg-color--lighter);
 }
 
-.md-typeset .quote > .admonition-title,
+.md-typeset .admonition.quote,
+.md-typeset details.quote {
+  background-color: var(--webis-surface-color);
+}
+
 .md-typeset .quote > summary {
-  background-color: transparent;
   color: var(--md-default-fg-color--light);
 }
 
-.md-typeset .quote > .admonition-title::before,
-.md-typeset .quote > summary::before {
-  background-color: var(--webis-mediumgray);
-}
-
 /* ------------------------------------------------------------------------
- * Code blocks: flat, typewriter-like.
+ * Code: Consolas, light gray inline code, outlined code blocks.
  * --------------------------------------------------------------------- */
-
-.md-typeset pre > code {
-  border-left: 3px solid var(--webis-lightgray);
-}
 
 .md-typeset code {
   border-radius: 0;
+  font-size: 0.875em;
+}
+
+.md-typeset pre > code {
+  background-color: var(--md-default-bg-color);
+  border: 1px solid var(--webis-rule-color);
+  border-radius: 3px;
+}
+
+.md-typeset .admonition pre > code,
+.md-typeset details pre > code {
+  background-color: var(--md-code-bg-color);
 }
 
 /* ------------------------------------------------------------------------
- * Badges: small boxed labels, e.g., for names or acronyms.
+ * Buttons: uppercase, square, blue primary buttons.
  * --------------------------------------------------------------------- */
 
+.md-typeset .md-button {
+  padding: 0.5em 2em;
+  border: 1px solid var(--webis-rule-color);
+  border-radius: 0;
+  color: var(--md-typeset-color);
+  font-size: 0.875em;
+  font-weight: 400;
+  text-transform: uppercase;
+}
+
+.md-typeset .md-button:hover,
+.md-typeset .md-button:focus {
+  background-color: transparent;
+  border-color: var(--webis-border-strong);
+  color: var(--md-typeset-color);
+}
+
+.md-typeset .md-button--primary {
+  background-color: var(--webis-blue);
+  border-color: transparent;
+  color: #ffffff;
+}
+
+.md-typeset .md-button--primary:hover,
+.md-typeset .md-button--primary:focus {
+  background-color: var(--webis-blue-dark);
+  border-color: transparent;
+  color: #ffffff;
+}
+
+/* Badges: small labels, e.g., for names or acronyms. */
 .md-typeset .badge {
   display: inline-block;
-  padding: 0 0.35em;
-  border: 1px solid var(--webis-blue-tl1);
-  color: var(--webis-blue-tl2);
-  font-family: var(--md-code-font-family);
-  font-size: 0.85em;
-  font-weight: 600;
+  padding: 0 0.6em;
+  border-radius: 2px;
+  background-color: var(--webis-blue);
+  color: #ffffff;
+  font-size: 0.8em;
+  line-height: 1.6;
+  text-transform: uppercase;
   white-space: nowrap;
+  vertical-align: middle;
 }
 
-[data-md-color-scheme="webis-dark"] .md-typeset .badge {
-  border-color: var(--webis-blue-a3);
-  color: var(--webis-blue-a2);
-}
-
-/* ------------------------------------------------------------------------
- * Home page hero.
- * --------------------------------------------------------------------- */
-
-.md-typeset .hero {
-  padding: 1.2rem 1.4rem;
-  margin: 0 0 1.5rem;
-  background-color: var(--webis-highlight-bg);
-  border-left: 3px solid var(--webis-yellow-a3);
-}
-
-.md-typeset .hero h1 {
-  margin: 0 0 0.2em;
-  font-size: 2.2em;
-}
-
-.md-typeset .hero p {
-  margin: 0.4em 0;
-}
-
-.md-typeset .hero .subtitle {
-  margin-top: 0;
-  font-size: 1.3em;
-}
-
+/* Cards: flat, with a thin border. */
 .md-typeset .grid.cards > ul > li,
 .md-typeset .grid > .card {
+  border: 1px solid var(--webis-rule-color);
   border-radius: 0;
   box-shadow: none;
 }
 
 .md-typeset .grid.cards > ul > li:hover,
 .md-typeset .grid > .card:hover {
-  border-color: var(--webis-blue-tl1);
+  border-color: var(--webis-border-strong);
   box-shadow: none;
 }
 
-.md-typeset .md-button {
-  border-radius: 0;
-  font-weight: 700;
-}
+/* ------------------------------------------------------------------------
+ * Hero: a dark box with white text, like the cover of webis.de.
+ * --------------------------------------------------------------------- */
 
-.md-typeset .md-button--primary {
-  background-color: var(--webis-blue-ld);
-  border-color: var(--webis-blue-ld);
+.md-typeset .hero {
+  padding: 2.5rem 1.6rem 1.6rem;
+  margin: 0 0 2rem;
+  background: linear-gradient(to bottom, #4a4a4a 0%, var(--webis-dark) 70%);
   color: #ffffff;
 }
 
-.md-typeset .md-button--primary:hover,
-.md-typeset .md-button:hover {
-  background-color: var(--webis-red-tl1);
-  border-color: var(--webis-red-tl1);
+.md-typeset .hero h1 {
+  margin: 0 0 0.4em;
+  color: #ffffff;
+  font-size: 2.65em;
+  line-height: 1.2;
+}
+
+.md-typeset .hero p {
+  margin: 0.6em 0;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.md-typeset .hero .subtitle {
+  margin-top: 0;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.md-typeset .hero a:not(.md-button) {
+  color: #ffffff;
+  text-decoration: underline;
+}
+
+.md-typeset .hero .md-button:not(.md-button--primary) {
+  border-color: rgba(255, 255, 255, 0.4);
   color: #ffffff;
 }
 
-[data-md-color-scheme="webis-dark"] .md-typeset .md-button--primary {
-  background-color: var(--webis-blue-tl2);
-  border-color: var(--webis-blue-tl2);
+.md-typeset .hero .md-button:not(.md-button--primary):hover {
+  border-color: #ffffff;
 }
 
 /* ------------------------------------------------------------------------
- * Footer: small gray text, like the slide footer.
+ * Footer: light gray, with small gray text.
  * --------------------------------------------------------------------- */
 
 .md-footer {
-  border-top: 1px solid var(--md-default-fg-color--lightest);
+  border-top: 1px solid var(--webis-rule-color);
 }
 
 .md-footer-meta {
-  border-top: 1px solid var(--md-default-fg-color--lightest);
-  font-size: 0.65rem;
+  border-top: 1px solid var(--webis-rule-color);
 }
 
 .md-footer-meta,
-.md-footer-meta a,
 .md-copyright,
+.md-social {
+  font-size: 0.6125rem;
+}
+
+.md-footer-meta,
+.md-copyright {
+  color: var(--md-footer-fg-color--light);
+}
+
+.md-footer-meta.md-typeset a,
 .md-copyright__highlight {
-  color: var(--webis-mediumgray);
+  color: var(--md-footer-fg-color--light);
 }
 
-.md-footer-meta a:hover {
+.md-footer-meta.md-typeset a:hover,
+.md-footer-meta.md-typeset a:focus {
   color: var(--md-accent-fg-color);
-}
-
-.md-footer__title {
-  color: var(--md-footer-fg-color);
-}
-
-.md-footer__direction {
-  color: var(--webis-mediumgray);
-}
-
-/* Secondary buttons: outlined in dark blue (the header's primary color is white). */
-.md-typeset .md-button:not(.md-button--primary) {
-  color: var(--webis-heading-color);
-  border-color: var(--webis-heading-color);
 }
 
 /* Definition lists: bold terms. */
 .md-typeset dt {
   font-weight: 700;
-}
-
-.md-typeset dd {
-  margin-top: 0.2em;
-}
-
-.md-typeset table:not([class]) th,
-.md-typeset table:not([class]) td {
-  padding: 0.6em 1em;
 }
