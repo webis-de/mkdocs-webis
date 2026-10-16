@@ -44,7 +44,7 @@ webis = "mkdocs_webis.plugin:WebisPlugin"
 "Bug Tracker" = "https://github.com/webis-de/mkdocs-webis/issues"
 
 [build-system]
-requires = ["setuptools>=80.9,<85.0", "setuptools-scm>=8,<10"]
+requires = ["setuptools>=80.9,<85.0", "setuptools-scm>=8,<11"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools.packages.find]
