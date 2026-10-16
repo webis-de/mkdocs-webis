@@ -14,7 +14,9 @@ BIBTEX = """@article{doe2020test,
 """
 
 
-def _build(tmp_path: Path, plugin_config: str, page: str = "# Home\n") -> Path:
+def _build(
+    tmp_path: Path, plugin_config: str, page: str = "# Home\n", theme: str = ""
+) -> Path:
     docs_dir = tmp_path / "docs"
     docs_dir.mkdir()
     (docs_dir / "index.md").write_text(page)
@@ -24,10 +26,7 @@ def _build(tmp_path: Path, plugin_config: str, page: str = "# Home\n") -> Path:
         "site_name: Test\n"
         "theme:\n"
         "  name: material\n"
-        "markdown_extensions:\n"
-        "  - admonition\n"
-        "  - pymdownx.details\n"
-        "  - pymdownx.superfences\n"
+        f"{theme}"
         "plugins:\n"
         f"  - webis{plugin_config}\n"
     )
@@ -44,11 +43,32 @@ def test_style_and_palette(tmp_path: Path) -> None:
     assert "assets/webis/webis.css" in html
     assert 'data-md-color-scheme="webis"' in html
     assert "fonts.googleapis.com" not in html
+    assert (site_dir / "assets" / "webis" / "webis-logo.png").is_file()
+    assert "assets/webis/webis-logo.png" in html
+    assert "assets/webis/favicon.png" in html
+
+
+def test_google_fonts(tmp_path: Path) -> None:
+    site_dir = _build(tmp_path, ":\n      google_fonts: true")
+    html = (site_dir / "index.html").read_text()
+    assert "fonts.googleapis.com" in html
+    assert "Noto+Sans" in html
+
+
+def test_own_logo(tmp_path: Path) -> None:
+    site_dir = _build(tmp_path, "", theme="  logo: logo.svg\n  favicon: logo.svg\n")
+    assert not (site_dir / "assets" / "webis" / "webis-logo.png").exists()
+    assert not (site_dir / "assets" / "webis" / "favicon.png").exists()
+    html = (site_dir / "index.html").read_text()
+    assert "logo.svg" in html
 
 
 def test_no_style(tmp_path: Path) -> None:
-    site_dir = _build(tmp_path, ":\n      style: false\n      palette: false")
+    site_dir = _build(
+        tmp_path, ":\n      style: false\n      palette: false\n      logo: false"
+    )
     assert not (site_dir / "assets" / "webis" / "webis.css").exists()
+    assert not (site_dir / "assets" / "webis" / "webis-logo.png").exists()
     html = (site_dir / "index.html").read_text()
     assert 'data-md-color-scheme="webis"' not in html
 
@@ -60,10 +80,12 @@ def test_citations(tmp_path: Path) -> None:
         page="# Home\n\nAs shown before [@doe2020test].\n",
     )
     html = (site_dir / "index.html").read_text()
-    assert 'href="#doe2020test"' in html
-    assert "Doe, 2020" in html
+    assert 'class="citation"' in html
+    assert '&#91;<a href="#doe2020test">Doe, 2020</a>&#93;' in html
     assert 'id="references"' in html
-    assert 'id="doe2020test"' in html
+    assert '<div class="reference" id="doe2020test">' in html
+    assert '<label for="bibtex-doe2020test">bib</label>' in html
+    assert '<pre class="reference-bibtex"><code>@article{doe2020test,' in html
 
 
 def test_unknown_citation(tmp_path: Path) -> None:
