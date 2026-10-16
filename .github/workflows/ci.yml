@@ -130,13 +130,13 @@ jobs:
         env:
           DISABLE_MKDOCS_2_WARNING: "true"
       - name: "📤 Upload documentation"
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
         uses: actions/upload-pages-artifact@v5
         with:
           path: site
   docs-deploy:
     name: "🚀 Deploy documentation to GitHub Pages"
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
     needs:
       - docs-build
     runs-on: ubuntu-latest
