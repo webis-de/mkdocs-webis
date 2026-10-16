@@ -70,22 +70,14 @@ def test_header(tmp_path: Path) -> None:
     assert html.index("webis-header__nav") < html.index("webis-header__source")
 
 
-def test_no_header(tmp_path: Path) -> None:
-    site_dir = _build(
-        tmp_path,
-        ":\n      header: false",
-        theme="  features:\n    - navigation.tabs\n",
-    )
+def test_custom_dir_overrides_header(tmp_path: Path) -> None:
+    custom_dir = tmp_path / "overrides" / "partials"
+    custom_dir.mkdir(parents=True)
+    (custom_dir / "header.html").write_text("<header>Custom header</header>")
+    site_dir = _build(tmp_path, "", theme="  custom_dir: overrides\n")
     html = (site_dir / "index.html").read_text()
+    assert "Custom header" in html
     assert "webis-header" not in html
-    assert 'class="md-tabs"' in html
-
-
-def test_google_fonts(tmp_path: Path) -> None:
-    site_dir = _build(tmp_path, ":\n      google_fonts: true")
-    html = (site_dir / "index.html").read_text()
-    assert "fonts.googleapis.com" in html
-    assert "Noto+Sans" in html
 
 
 def test_own_logo(tmp_path: Path) -> None:
@@ -94,16 +86,6 @@ def test_own_logo(tmp_path: Path) -> None:
     assert not (site_dir / "assets" / "webis" / "favicon.png").exists()
     html = (site_dir / "index.html").read_text()
     assert "logo.svg" in html
-
-
-def test_no_style(tmp_path: Path) -> None:
-    site_dir = _build(
-        tmp_path, ":\n      style: false\n      logo: false"
-    )
-    assert not (site_dir / "assets" / "webis" / "webis.css").exists()
-    assert not (site_dir / "assets" / "webis" / "webis-logo.png").exists()
-    html = (site_dir / "index.html").read_text()
-    assert "assets/webis/webis.css" not in html
 
 
 def test_citations(tmp_path: Path) -> None:

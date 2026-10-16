@@ -15,7 +15,6 @@ _STYLESHEET_PATH = "assets/webis/webis.css"
 _LOGO_PATH = "assets/webis/webis-logo.png"
 _FAVICON_PATH = "assets/webis/favicon.png"
 _DEFAULT_FAVICON_PATH = "assets/images/favicon.png"
-_GOOGLE_FONTS = {"text": "Noto Sans", "code": "Noto Sans Mono"}
 
 # Only the light color scheme of webis.de, without a toggle.
 _PALETTE = {"scheme": "webis", "primary": "custom", "accent": "custom"}
@@ -24,20 +23,8 @@ log = get_plugin_logger(__name__)
 
 
 class WebisPluginConfig(base.Config):
-    style = config_options.Type(bool, default=True)
-    """Add the Webis stylesheet."""
-    google_fonts = config_options.Type(bool, default=False)
-    """Load Noto Sans from Google Fonts (otherwise, only use installed fonts)."""
-    header = config_options.Type(bool, default=True)
-    """Show the navigation, search, and repository link in the header line."""
-    logo = config_options.Type(bool, default=True)
-    """Use the Webis logo and favicon, unless the theme configures its own."""
     bibliography = config_options.Optional(config_options.Type(str))
     """Path of a BibTeX file (relative to the docs directory) for citations."""
-    references_heading = config_options.Type(str, default="References")
-    """Heading of the references section appended to pages with citations."""
-    show_bibtex = config_options.Type(bool, default=True)
-    """Show the BibTeX of each reference in a collapsible block."""
 
 
 class WebisPlugin(BasePlugin[WebisPluginConfig]):
@@ -60,23 +47,22 @@ class WebisPlugin(BasePlugin[WebisPluginConfig]):
             )
         else:
             theme["palette"] = dict(_PALETTE)
-            if self.config.header:
-                # After the user's custom_dir, so that it can still override templates.
-                templates_dir = str(files("mkdocs_webis").joinpath("templates"))
-                if templates_dir not in theme.dirs:
-                    index = 1 if theme.custom_dir else 0
-                    theme.dirs.insert(index, templates_dir)
-            # Like webis.de, prefer Product Sans and Noto Sans (see the stylesheet).
-            theme["font"] = dict(_GOOGLE_FONTS) if self.config.google_fonts else False
-            if self.config.logo:
-                icon = theme.get("icon") or {}
-                if not theme.get("logo") and not icon.get("logo"):
-                    theme["logo"] = _LOGO_PATH
-                    self._logo = True
-                if theme.get("favicon") in (None, _DEFAULT_FAVICON_PATH):
-                    theme["favicon"] = _FAVICON_PATH
-                    self._favicon = True
-        if self.config.style and _STYLESHEET_PATH not in config.extra_css:
+            # The Webis header, after the user's custom_dir (which can override it).
+            templates_dir = str(files("mkdocs_webis").joinpath("templates"))
+            if templates_dir not in theme.dirs:
+                index = 1 if theme.custom_dir else 0
+                theme.dirs.insert(index, templates_dir)
+            # Like webis.de, only use installed fonts (see the stylesheet).
+            theme["font"] = False
+            # The Webis logo and favicon, unless the theme configures its own.
+            icon = theme.get("icon") or {}
+            if not theme.get("logo") and not icon.get("logo"):
+                theme["logo"] = _LOGO_PATH
+                self._logo = True
+            if theme.get("favicon") in (None, _DEFAULT_FAVICON_PATH):
+                theme["favicon"] = _FAVICON_PATH
+                self._favicon = True
+        if _STYLESHEET_PATH not in config.extra_css:
             # Insert first, so that the user's stylesheets can override the style.
             config.extra_css.insert(0, _STYLESHEET_PATH)
         return config
@@ -89,23 +75,18 @@ class WebisPlugin(BasePlugin[WebisPluginConfig]):
         if not path.is_file():
             raise PluginError(f"Bibliography file not found: {path}")
         try:
-            self._bibliography = Bibliography.from_file(
-                path,
-                heading=self.config.references_heading,
-                show_bibtex=self.config.show_bibtex,
-            )
+            self._bibliography = Bibliography.from_file(path)
         except BibliographyError as error:
             raise PluginError(f"Invalid bibliography file {path}: {error}") from error
 
     def on_files(self, files: Files, *, config: MkDocsConfig) -> Files | None:
-        if self.config.style:
-            files.append(
-                File.generated(
-                    config=config,
-                    src_uri=_STYLESHEET_PATH,
-                    content=files_resource("webis.css").read_text(encoding="utf-8"),
-                )
+        files.append(
+            File.generated(
+                config=config,
+                src_uri=_STYLESHEET_PATH,
+                content=files_resource("webis.css").read_text(encoding="utf-8"),
             )
+        )
         if self._logo:
             files.append(
                 File.generated(

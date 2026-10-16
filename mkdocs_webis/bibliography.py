@@ -187,13 +187,11 @@ class Bibliography:
     """Replace citations in Markdown pages and render reference lists."""
 
     entries: Mapping[str, Entry]
-    heading: str = "References"
-    show_bibtex: bool = True
     _cited_keys: set[str] = field(default_factory=set, init=False, repr=False)
 
     @classmethod
-    def from_file(cls, path: Path, **kwargs) -> "Bibliography":
-        return cls(entries=parse_bibtex(path.read_text(encoding="utf-8")), **kwargs)
+    def from_file(cls, path: Path) -> "Bibliography":
+        return cls(entries=parse_bibtex(path.read_text(encoding="utf-8")))
 
     def _replace_citation(self, match: Match[str]) -> str:
         keys = [
@@ -213,19 +211,13 @@ class Bibliography:
     def render_reference(self, entry: Entry) -> str:
         """Render a reference in HTML, with links to its BibTeX and DOI."""
         key = escape(entry.key)
-        links = []
-        toggle = ""
-        bibtex = ""
-        if self.show_bibtex:
-            # A (visually hidden) checkbox toggles the BibTeX without JavaScript.
-            toggle = (
-                f'<input type="checkbox" id="bibtex-{key}" class="reference-toggle" '
-                f'aria-label="Show BibTeX">'
-            )
-            links.append(f'[<label for="bibtex-{key}">bib</label>]')
-            bibtex = (
-                f'<pre class="reference-bibtex"><code>{escape(entry.bibtex)}</code></pre>'
-            )
+        # A (visually hidden) checkbox toggles the BibTeX without JavaScript.
+        toggle = (
+            f'<input type="checkbox" id="bibtex-{key}" class="reference-toggle" '
+            f'aria-label="Show BibTeX">'
+        )
+        links = [f'[<label for="bibtex-{key}">bib</label>]']
+        bibtex = f'<pre class="reference-bibtex"><code>{escape(entry.bibtex)}</code></pre>'
         if "doi" in entry.fields:
             doi = escape(f"https://doi.org/{entry.fields['doi']}")
             links.append(f'[<a href="{doi}">doi</a>]')
@@ -238,12 +230,12 @@ class Bibliography:
             bibtex,
             "</div>",
         ]
-        return "\n".join(line for line in block if line)
+        return "\n".join(block)
 
     def render_references(self, keys: Iterable[str]) -> str:
         """Render the references section for the given keys."""
         entries = sorted((self.entries[key] for key in keys), key=lambda e: e.sort_key)
-        blocks = [f"## {self.heading}"]
+        blocks = ["## References"]
         blocks.extend(self.render_reference(entry) for entry in entries)
         return "\n\n".join(blocks) + "\n"
 

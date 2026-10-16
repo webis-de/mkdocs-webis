@@ -39,16 +39,4 @@ plugins:
       bibliography: references.bib  # Optional: BibTeX file in your docs directory.
 ```
 
-## Configuration
-
-| Option | Default | Description |
-|:--|:--|:--|
-| `style` | `true` | Add the Webis stylesheet. |
-| `header` | `true` | Show the navigation (with the `navigation.tabs` feature), a repository icon, and a compact search in one header line, like on webis.de. |
-| `google_fonts` | `false` | Load Noto Sans from Google Fonts. By default, like webis.de, only installed fonts are used ("Product Sans", "Noto Sans", or Verdana). |
-| `logo` | `true` | Use the Webis logo and favicon, unless `theme.logo` or `theme.favicon` are set. |
-| `bibliography` | — | Path of a BibTeX file, relative to the docs directory. Enables [citations](citations.md). |
-| `references_heading` | `References` | Heading of the references section appended to pages with citations. |
-| `show_bibtex` | `true` | Add a "[bib]" link to each reference that shows its BibTeX. |
-
 See the [style elements](style.md) for how Markdown elements look with this style.

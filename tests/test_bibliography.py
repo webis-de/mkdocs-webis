@@ -149,13 +149,3 @@ def test_process_unknown_key() -> None:
     bibliography = Bibliography(entries=parse_bibtex(BIBTEX))
     with raises(BibliographyError):
         bibliography.process("See [@unknown].")
-
-
-def test_options() -> None:
-    bibliography = Bibliography(
-        entries=parse_bibtex(BIBTEX), heading="Literature", show_bibtex=False
-    )
-    markdown = bibliography.process("See [@fang2004formal].")
-    assert "## Literature" in markdown
-    assert "reference-bibtex" not in markdown
-    assert "bib</label>" not in markdown

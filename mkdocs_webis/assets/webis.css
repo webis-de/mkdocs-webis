@@ -40,11 +40,9 @@ body {
   /* Like webis.de, without Material's (thinner) antialiased font smoothing. */
   -webkit-font-smoothing: auto;
   -moz-osx-font-smoothing: auto;
-  /* Like webis.de, use Product Sans or Noto Sans if installed (or loaded). */
-  --md-text-font-family: "Product Sans", var(--md-text-font, "Noto Sans"),
-    "Noto Sans", Verdana, sans-serif;
-  --md-code-font-family: Consolas, var(--md-code-font, monaco), monaco,
-    monospace;
+  /* Like webis.de, use Product Sans or Noto Sans if installed. */
+  --md-text-font-family: "Product Sans", "Noto Sans", Verdana, sans-serif;
+  --md-code-font-family: Consolas, monaco, monospace;
 }
 
 /* The colors of webis.de (light only, like webis.de). */
@@ -338,35 +336,6 @@ html {
 
   .webis-header .md-search__output {
     top: 1.5rem;
-  }
-}
-
-/* Material's tabs, if the Webis header is disabled (header: false). */
-.md-tabs {
-  border-bottom: 1px solid var(--webis-dark-border);
-}
-
-.md-tabs__link {
-  color: rgba(255, 255, 255, 0.75);
-  opacity: 1;
-  font-size: calc(1.02 * var(--webis-font-size));
-  text-transform: uppercase;
-}
-
-.md-tabs__link:hover,
-.md-tabs__link:focus {
-  color: #ffffff;
-}
-
-.md-tabs__item--active .md-tabs__link {
-  color: #ffffff;
-  text-decoration: underline;
-  text-underline-position: under;
-}
-
-@media screen and (min-width: 76.25em) {
-  body:has(.md-tabs) .md-header {
-    border-bottom: none;
   }
 }
 
