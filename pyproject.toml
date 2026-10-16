@@ -23,6 +23,8 @@ classifiers = [
 dependencies = [
     "mkdocs~=1.6",
     "mkdocs-material~=9.6",
+    "bibtexparser~=2.0",
+    "pylatexenc~=2.10",
 ]
 dynamic = ["version"]
 
