@@ -30,52 +30,108 @@ BIBTEX = r"""
   title        = {Nested {Braces} in {\"{U}}ber-{T}itles},
   year         = {2020}
 }
+
+@misc{DBLP:journals/corr/abs-2307-00001,
+  editor       = {Ludwig van Beethoven},
+  title        = {Encoded {URL}s},
+  year         = {2023},
+  url          = {https://example.org/a%20b_c}
+}
 """
 
 
 def test_parse_entries() -> None:
     entries = parse_bibtex(BIBTEX)
-    assert list(entries) == ["fang2004formal", "lv2011lower", "froebe2020"]
+    assert list(entries) == [
+        "fang2004formal",
+        "lv2011lower",
+        "froebe2020",
+        "DBLP:journals/corr/abs-2307-00001",
+    ]
     assert entries["fang2004formal"].entry_type == "inproceedings"
-    assert entries["fang2004formal"].fields["pages"] == "49--56"
+    assert entries["fang2004formal"].fields["pages"] == "49–56"
     assert entries["fang2004formal"].bibtex.startswith("@inproceedings{fang2004formal,")
     assert entries["fang2004formal"].bibtex.endswith("}")
 
 
 def test_authors_and_short_citations() -> None:
     entries = parse_bibtex(BIBTEX)
-    assert entries["fang2004formal"].authors == ["Hui Fang", "Tao Tao", "ChengXiang Zhai"]
+    assert [author.full_name for author in entries["fang2004formal"].authors] == [
+        "Hui Fang",
+        "Tao Tao",
+        "ChengXiang Zhai",
+    ]
     assert entries["fang2004formal"].short_citation == "Fang et al., 2004"
     assert entries["lv2011lower"].short_citation == "Lv and Zhai, 2011"
     assert entries["froebe2020"].short_citation == "Fröbe, 2020"
+    # Editors, if there are no authors, and "von" parts belong to the last name.
+    editor_entry = entries["DBLP:journals/corr/abs-2307-00001"]
+    assert editor_entry.short_citation == "van Beethoven, 2023"
 
 
 def test_full_citation() -> None:
     entries = parse_bibtex(BIBTEX)
     citation = entries["fang2004formal"].full_citation
-    assert "Hui Fang, Tao Tao, and ChengXiang Zhai." in citation
-    assert "**A formal study of information retrieval heuristics.**" in citation
-    assert "_SIGIR 2004_" in citation
-    assert "49–56" in citation
-    assert "1(2)" in entries["lv2011lower"].full_citation
+    assert citation == (
+        "Hui Fang, Tao Tao, and ChengXiang Zhai. "
+        '<a href="https://doi.org/10.1145/1008992.1009004">'
+        '<span class="title">A formal study of information retrieval heuristics</span>'
+        '</a>. In <span class="venue">SIGIR 2004</span>, pages 49–56, 2004.'
+    )
+    assert (
+        '<span class="venue">J. Test</span>, 1 (2), 2011.'
+        in entries["lv2011lower"].full_citation
+    )
     assert "Nested Braces in Über-Titles" in entries["froebe2020"].full_citation
+    # URLs are not LaTeX (e.g., "%" is not a comment).
+    url_citation = entries["DBLP:journals/corr/abs-2307-00001"].full_citation
+    assert '<a href="https://example.org/a%20b_c">' in url_citation
 
 
 def test_duplicate_keys() -> None:
-    with raises(BibliographyError):
+    with raises(BibliographyError, match="Duplicate"):
         parse_bibtex(BIBTEX + BIBTEX)
+
+
+def test_invalid_bibtex() -> None:
+    with raises(BibliographyError, match="Invalid"):
+        parse_bibtex("@article{broken,\n  title = {Unclosed\n")
 
 
 def test_process_citations() -> None:
     bibliography = Bibliography(entries=parse_bibtex(BIBTEX))
-    markdown = bibliography.process("See [@fang2004formal; @lv2011lower].")
-    assert "([Fang et al., 2004](#fang2004formal); [Lv and Zhai, 2011](#lv2011lower))" in markdown
+    markdown = bibliography.process("See [@fang2004formal, @lv2011lower].")
+    assert (
+        '<span class="citation">&#91;'
+        '<a href="#fang2004formal">Fang et al., 2004</a>; '
+        '<a href="#lv2011lower">Lv and Zhai, 2011</a>'
+        "&#93;</span>"
+    ) in markdown
     assert "## References" in markdown
-    assert '<a id="fang2004formal"></a>' in markdown
-    assert '<a id="froebe2020"></a>' not in markdown
+    assert '<div class="reference" id="fang2004formal">' in markdown
+    assert 'id="froebe2020"' not in markdown
     # Sorted by first author.
     assert markdown.index('id="fang2004formal"') < markdown.index('id="lv2011lower"')
-    assert "```bibtex" in markdown
+    assert '<label for="bibtex-fang2004formal">bib</label>' in markdown
+    assert "<code>@inproceedings{fang2004formal," in markdown
+    # Raw HTML blocks must not contain blank lines.
+    references = markdown[markdown.index("## References") :]
+    for block in references.split("\n\n")[1:]:
+        assert block.startswith("<div") and block.rstrip().endswith("</div>")
+
+
+def test_process_citation_separators() -> None:
+    bibliography = Bibliography(entries=parse_bibtex(BIBTEX))
+    with_commas = bibliography.process("See [@fang2004formal,@lv2011lower].")
+    with_semicolons = bibliography.process("See [@fang2004formal; @lv2011lower].")
+    assert with_commas == with_semicolons
+
+
+def test_process_dblp_keys() -> None:
+    bibliography = Bibliography(entries=parse_bibtex(BIBTEX))
+    markdown = bibliography.process("See [@DBLP:journals/corr/abs-2307-00001].")
+    assert '<a href="#DBLP:journals/corr/abs-2307-00001">' in markdown
+    assert 'id="DBLP:journals/corr/abs-2307-00001"' in markdown
 
 
 def test_process_without_citations() -> None:
@@ -101,4 +157,5 @@ def test_options() -> None:
     )
     markdown = bibliography.process("See [@fang2004formal].")
     assert "## Literature" in markdown
-    assert "```bibtex" not in markdown
+    assert "reference-bibtex" not in markdown
+    assert "bib</label>" not in markdown

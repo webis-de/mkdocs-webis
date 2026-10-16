@@ -1,72 +1,63 @@
 """
 Citations from a BibTeX file.
 
-- ``[@key]`` or ``[@key1; @key2]`` in a page is replaced by author–year links.
+- ``[@key]`` or ``[@key1, @key2]`` in a page is replaced by author-year links,
+  e.g., "[Fang et al., 2004]".
 - Each page that cites at least one reference gets a references section at the
   bottom, listing the cited references, including the BibTeX of each entry.
 """
 
 from collections.abc import Iterable, Mapping
 from dataclasses import dataclass, field
+from html import escape
 from pathlib import Path
 from re import DOTALL, MULTILINE, Match, compile as re_compile
 from typing import Final
 
-_PATTERN_ENTRY: Final = re_compile(r"^@(\w+)\{([^,\s]+),", MULTILINE)
-_PATTERN_FIELD_NAME: Final = re_compile(r"\s*(\w+)\s*=\s*\{")
-_PATTERN_AUTHOR_SEPARATOR: Final = re_compile(r"\s+and\s+")
-_PATTERN_CITATION: Final = re_compile(r"\[(@[\w-]+(?:\s*;\s*@[\w-]+)*)\]")
+from bibtexparser.entrypoint import parse_string
+from bibtexparser.middlewares import SeparateCoAuthors, SplitNameParts
+from bibtexparser.middlewares.names import NameParts
+from bibtexparser.model import DuplicateBlockKeyBlock, Entry as BibtexEntry
+from pylatexenc.latex2text import LatexNodes2Text
+
+_PATTERN_CITATION: Final = re_compile(r"\[(@[^\s,;\]]+(?:\s*[,;]\s*@[^\s,;\]]+)*)\]")
+_PATTERN_CITATION_SEPARATOR: Final = re_compile(r"\s*[,;]\s*")
 # Fenced code blocks and inline code spans, in which citations are not replaced.
 _PATTERN_CODE: Final = re_compile(
     r"(^[ \t]*```.*?^[ \t]*```|`[^`\n]+`)", MULTILINE | DOTALL
 )
+# Fields that are not LaTeX (where, e.g., "%" is not a comment).
+_VERBATIM_FIELDS: Final = frozenset({"url", "doi", "eprint"})
 
-_LATEX_REPLACEMENTS: Final[Mapping[str, str]] = {
-    r"{\"{o}}": "ö",
-    r"{\"{a}}": "ä",
-    r"{\"{u}}": "ü",
-    r"{\"{O}}": "Ö",
-    r"{\"{A}}": "Ä",
-    r"{\"{U}}": "Ü",
-    r"{\'{e}}": "é",
-    r"{\'{E}}": "É",
-    r"{\'{o}}": "ó",
-    r"{\'{a}}": "á",
-    r"{\`{e}}": "è",
-    r"{\u{a}}": "ă",
-    r"{\^{a}}": "â",
-    r"{\ss}": "ß",
-    r"\&": "&",
-    r"{-}": "-",
-    r"\_": "_",
-}
+_latex_to_text: Final = LatexNodes2Text()
 
 
 class BibliographyError(ValueError):
     """Raised for malformed BibTeX files or unknown citation keys."""
 
 
-def _read_braced(text: str, start: int) -> int:
-    """Return the index just after the brace closing the one opened before ``start``."""
-    depth = 1
-    index = start
-    while depth > 0:
-        if index >= len(text):
-            raise BibliographyError("Unbalanced braces in BibTeX file.")
-        if text[index] == "{":
-            depth += 1
-        elif text[index] == "}":
-            depth -= 1
-        index += 1
-    return index
-
-
 def clean_latex(value: str) -> str:
-    """Convert (a subset of) LaTeX markup in a BibTeX value to plain text."""
-    for latex, text in _LATEX_REPLACEMENTS.items():
-        value = value.replace(latex, text)
-    value = value.replace("{", "").replace("}", "")
-    return " ".join(value.split())
+    """Convert LaTeX markup in a BibTeX value to plain text."""
+    return " ".join(_latex_to_text.latex_to_text(value).split())
+
+
+@dataclass(frozen=True)
+class Author:
+    """An author (or editor) name, split into its parts."""
+
+    first: str
+    last: str
+
+    @property
+    def full_name(self) -> str:
+        return f"{self.first} {self.last}".strip()
+
+
+def _author(name: NameParts) -> Author:
+    return Author(
+        first=clean_latex(" ".join(name.first)),
+        last=clean_latex(" ".join([*name.von, *name.last, *name.jr])),
+    )
 
 
 @dataclass(frozen=True)
@@ -76,16 +67,29 @@ class Entry:
     key: str
     entry_type: str
     fields: Mapping[str, str]
+    authors: tuple[Author, ...]
     bibtex: str
 
-    @property
-    def authors(self) -> list[str]:
-        authors = self.fields.get("author") or self.fields.get("editor") or ""
-        return [
-            clean_latex(author)
-            for author in _PATTERN_AUTHOR_SEPARATOR.split(authors)
-            if author.strip()
-        ]
+    @classmethod
+    def from_bibtex(cls, entry: BibtexEntry) -> "Entry":
+        fields: dict[str, str] = {}
+        names: list[NameParts] = []
+        for bibtex_field in entry.fields:
+            name = bibtex_field.key.lower()
+            if name in ("author", "editor"):
+                if name == "author" or not names:
+                    names = bibtex_field.value
+            elif name in _VERBATIM_FIELDS:
+                fields[name] = bibtex_field.value
+            else:
+                fields[name] = clean_latex(bibtex_field.value)
+        return cls(
+            key=entry.key,
+            entry_type=entry.entry_type.lower(),
+            fields=fields,
+            authors=tuple(_author(name) for name in names),
+            bibtex=(entry.raw or "").strip(),
+        )
 
     @property
     def year(self) -> str:
@@ -94,9 +98,9 @@ class Entry:
     @property
     def short_citation(self) -> str:
         """Author–year citation, e.g., "Fang et al., 2004"."""
-        surnames = [author.split()[-1] for author in self.authors]
+        surnames = [author.last for author in self.authors]
         if len(surnames) == 0:
-            names = clean_latex(self.fields.get("title", self.key))
+            names = self.fields.get("title", self.key)
         elif len(surnames) == 1:
             names = surnames[0]
         elif len(surnames) == 2:
@@ -106,69 +110,76 @@ class Entry:
         return f"{names}, {self.year}"
 
     @property
+    def link(self) -> str | None:
+        """Link to the publication (its URL, or else its DOI)."""
+        if "url" in self.fields:
+            return self.fields["url"]
+        if "doi" in self.fields:
+            return f"https://doi.org/{self.fields['doi']}"
+        return None
+
+    @property
     def full_citation(self) -> str:
-        """Full citation in Markdown."""
-        authors = self.authors
+        """
+        Full citation in HTML, like on webis.de, e.g., "Hui Fang, Tao Tao, and
+        ChengXiang Zhai. A formal study of information retrieval heuristics.
+        In SIGIR 2004, pages 49–56, 2004. ACM."
+        """
+        fields = {name: escape(value) for name, value in self.fields.items()}
+        authors = [escape(author.full_name) for author in self.authors]
         if len(authors) > 2:
             author_text = ", ".join(authors[:-1]) + ", and " + authors[-1]
         else:
             author_text = " and ".join(authors)
-        title = clean_latex(self.fields.get("title", ""))
-        venue = clean_latex(
-            self.fields.get("booktitle")
-            or self.fields.get("journal")
-            or self.fields.get("institution")
-            or self.fields.get("publisher")
-            or self.fields.get("howpublished", "")
-        )
+
+        title = f'<span class="title">{fields.get("title", escape(self.key))}</span>'
+        if self.link is not None:
+            title = f'<a href="{escape(self.link)}">{title}</a>'
+
         details = []
-        if "volume" in self.fields and "journal" in self.fields:
-            volume = self.fields["volume"]
-            if "number" in self.fields:
-                volume += f"({self.fields['number']})"
-            details.append(volume)
-        if "pages" in self.fields:
-            details.append(clean_latex(self.fields["pages"]).replace("--", "–"))
-        details.append(self.year)
-        citation = f"{author_text}. **{title}.**"
-        if venue:
-            citation += f" _{venue}_,"
-        citation += " " + ", ".join(details) + "."
-        if "url" in self.fields:
-            url = clean_latex(self.fields["url"])
-            citation += f" [{url}]({url})"
-        return citation
+        if "journal" in fields:
+            journal = f'<span class="venue">{fields["journal"]}</span>'
+            if "volume" in fields:
+                journal += f", {fields['volume']}"
+                if "number" in fields:
+                    journal += f" ({fields['number']})"
+                if "pages" in fields:
+                    journal += f" : {fields['pages']}"
+            elif "pages" in fields:
+                journal += f", pages {fields['pages']}"
+            details.append(journal)
+        else:
+            if "booktitle" in fields:
+                details.append(f'In <span class="venue">{fields["booktitle"]}</span>')
+            elif venue := (fields.get("institution") or fields.get("howpublished")):
+                details.append(f'<span class="venue">{venue}</span>')
+            if "pages" in fields:
+                details.append(f"pages {fields['pages']}")
+        details.append(escape(self.year))
+
+        parts = [f"{author_text}." if author_text else "", f"{title}."]
+        parts.append(", ".join(details) + ".")
+        if "publisher" in fields and "journal" not in fields:
+            parts.append(f"{fields['publisher']}.")
+        return " ".join(part for part in parts if part)
 
     @property
     def sort_key(self) -> tuple[str, str, str]:
-        authors = self.authors
-        first_author = authors[0].split()[-1].lower() if authors else ""
+        first_author = self.authors[0].last.lower() if self.authors else ""
         return first_author, self.year, self.key
 
 
 def parse_bibtex(text: str) -> dict[str, Entry]:
-    """Parse the entries of a BibTeX file (fields must be enclosed in braces)."""
-    entries: dict[str, Entry] = {}
-    for match in _PATTERN_ENTRY.finditer(text):
-        entry_type, key = match.groups()
-        entry_end = _read_braced(text, match.start() + len(entry_type) + 2)
-        fields: dict[str, str] = {}
-        position = match.end()
-        while (field_match := _PATTERN_FIELD_NAME.match(text, position)) is not None:
-            value_end = _read_braced(text, field_match.end())
-            fields[field_match.group(1).lower()] = text[
-                field_match.end() : value_end - 1
-            ]
-            position = value_end + 1  # Skip the trailing comma.
-        if key in entries:
-            raise BibliographyError(f"Duplicate BibTeX key '{key}'.")
-        entries[key] = Entry(
-            key=key,
-            entry_type=entry_type.lower(),
-            fields=fields,
-            bibtex=text[match.start() : entry_end],
-        )
-    return entries
+    """Parse the entries of a BibTeX file."""
+    library = parse_string(
+        text, append_middleware=[SeparateCoAuthors(), SplitNameParts()]
+    )
+    for block in library.failed_blocks:
+        if isinstance(block, DuplicateBlockKeyBlock):
+            raise BibliographyError(f"Duplicate BibTeX key '{block.key}'.")
+        line = "" if block.start_line is None else f" (line {block.start_line + 1})"
+        raise BibliographyError(f"Invalid BibTeX block{line}: {block.error}")
+    return {entry.key: Entry.from_bibtex(entry) for entry in library.entries}
 
 
 @dataclass
@@ -185,26 +196,56 @@ class Bibliography:
         return cls(entries=parse_bibtex(path.read_text(encoding="utf-8")), **kwargs)
 
     def _replace_citation(self, match: Match[str]) -> str:
-        keys = [key.strip().lstrip("@") for key in match.group(1).split(";")]
+        keys = [
+            key.lstrip("@")
+            for key in _PATTERN_CITATION_SEPARATOR.split(match.group(1))
+        ]
         links = []
         for key in keys:
             if key not in self.entries:
                 raise BibliographyError(f"Unknown citation key '{key}'.")
             self._cited_keys.add(key)
-            links.append(f"[{self.entries[key].short_citation}](#{key})")
-        return "(" + "; ".join(links) + ")"
+            citation = escape(self.entries[key].short_citation)
+            links.append(f'<a href="#{escape(key)}">{citation}</a>')
+        # Brackets as entities, so that they are not parsed as Markdown links.
+        return '<span class="citation">&#91;' + "; ".join(links) + "&#93;</span>"
+
+    def render_reference(self, entry: Entry) -> str:
+        """Render a reference in HTML, with links to its BibTeX and DOI."""
+        key = escape(entry.key)
+        links = []
+        toggle = ""
+        bibtex = ""
+        if self.show_bibtex:
+            # A (visually hidden) checkbox toggles the BibTeX without JavaScript.
+            toggle = (
+                f'<input type="checkbox" id="bibtex-{key}" class="reference-toggle" '
+                f'aria-label="Show BibTeX">'
+            )
+            links.append(f'[<label for="bibtex-{key}">bib</label>]')
+            bibtex = (
+                f'<pre class="reference-bibtex"><code>{escape(entry.bibtex)}</code></pre>'
+            )
+        if "doi" in entry.fields:
+            doi = escape(f"https://doi.org/{entry.fields['doi']}")
+            links.append(f'[<a href="{doi}">doi</a>]')
+        links_html = f'<span class="reference-links">{" ".join(links)}</span>'
+        # No blank lines, so that Markdown keeps the block as raw HTML.
+        block = [
+            f'<div class="reference" id="{key}">',
+            entry.full_citation,
+            toggle + links_html,
+            bibtex,
+            "</div>",
+        ]
+        return "\n".join(line for line in block if line)
 
     def render_references(self, keys: Iterable[str]) -> str:
         """Render the references section for the given keys."""
         entries = sorted((self.entries[key] for key in keys), key=lambda e: e.sort_key)
-        blocks = [f"## {self.heading}\n"]
-        for entry in entries:
-            block = f'<a id="{entry.key}"></a>\n{entry.full_citation}\n'
-            if self.show_bibtex:
-                bibtex = "\n".join("    " + line for line in entry.bibtex.splitlines())
-                block += f'\n??? quote "BibTeX"\n\n    ```bibtex\n{bibtex}\n    ```\n'
-            blocks.append(block)
-        return "\n".join(blocks)
+        blocks = [f"## {self.heading}"]
+        blocks.extend(self.render_reference(entry) for entry in entries)
+        return "\n\n".join(blocks) + "\n"
 
     def process(self, markdown: str) -> str:
         """Replace citations and append the references section, if any."""
