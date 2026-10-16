@@ -47,7 +47,7 @@ body {
     monospace;
 }
 
-/* Light scheme: the colors of webis.de. */
+/* The colors of webis.de (light only, like webis.de). */
 [data-md-color-scheme="webis"] {
   color-scheme: light;
 
@@ -96,57 +96,6 @@ body {
   --md-footer-fg-color--lighter: #999999;
   --md-footer-bg-color: var(--webis-muted-bg);
   --md-footer-bg-color--dark: var(--webis-muted-bg);
-}
-
-/* Dark scheme: the dark gray of the webis.de navigation bar, everywhere. */
-[data-md-color-scheme="webis-dark"] {
-  color-scheme: dark;
-
-  --md-default-fg-color: rgba(255, 255, 255, 0.85);
-  --md-default-fg-color--light: rgba(255, 255, 255, 0.6);
-  --md-default-fg-color--lighter: rgba(255, 255, 255, 0.35);
-  --md-default-fg-color--lightest: rgba(255, 255, 255, 0.12);
-  --md-default-bg-color: #222222;
-
-  --md-primary-fg-color: var(--webis-dark);
-  --md-primary-fg-color--light: var(--webis-dark);
-  --md-primary-fg-color--dark: var(--webis-dark);
-  --md-primary-bg-color: #ffffff;
-  --md-primary-bg-color--light: rgba(255, 255, 255, 0.7);
-
-  --md-accent-fg-color: #4aa1f3;
-  --md-accent-fg-color--transparent: rgba(74, 161, 243, 0.12);
-  --md-accent-bg-color: #222222;
-
-  --md-typeset-color: rgba(255, 255, 255, 0.85);
-  --md-typeset-a-color: #7fb3f5;
-  --md-typeset-mark-color: rgba(250, 160, 90, 0.3);
-
-  --webis-heading-color: #ffffff;
-  --webis-rule-color: rgba(255, 255, 255, 0.12);
-  --webis-surface-color: #2a2a2a;
-
-  --md-code-fg-color: #e5e5e5;
-  --md-code-bg-color: #2a2a2a;
-  --md-code-hl-color: rgba(250, 160, 90, 0.2);
-  --md-code-hl-keyword-color: #7fb3f5;
-  --md-code-hl-function-color: #8ec5ff;
-  --md-code-hl-string-color: var(--webis-green);
-  --md-code-hl-number-color: var(--webis-orange);
-  --md-code-hl-constant-color: var(--webis-orange);
-  --md-code-hl-special-color: var(--webis-red);
-  --md-code-hl-name-color: var(--md-code-fg-color);
-  --md-code-hl-operator-color: rgba(255, 255, 255, 0.6);
-  --md-code-hl-punctuation-color: rgba(255, 255, 255, 0.6);
-  --md-code-hl-comment-color: rgba(255, 255, 255, 0.45);
-  --md-code-hl-generic-color: rgba(255, 255, 255, 0.6);
-  --md-code-hl-variable-color: #b9a8ff;
-
-  --md-footer-fg-color: rgba(255, 255, 255, 0.85);
-  --md-footer-fg-color--light: rgba(255, 255, 255, 0.6);
-  --md-footer-fg-color--lighter: rgba(255, 255, 255, 0.35);
-  --md-footer-bg-color: #2a2a2a;
-  --md-footer-bg-color--dark: #2a2a2a;
 }
 
 /* ------------------------------------------------------------------------
@@ -238,8 +187,9 @@ html {
 }
 
 /* Site name and navigation links, like the links of the webis.de navbar. */
+/* The title fills the space, which moves everything else to the right. */
 [dir] .webis-header .md-header__title {
-  flex-grow: 0;
+  flex-grow: 1;
   margin-left: 0.25em;
   margin-right: 0.75rem;
 }
@@ -275,18 +225,6 @@ html {
   }
 }
 
-/* Without the navigation, palette, repository, and search go to the right. */
-.webis-header .md-header__title + .md-header__option,
-.webis-header .md-header__title + .webis-header__source {
-  margin-left: auto;
-}
-
-@media screen and (max-width: 76.234375em) {
-  .webis-header .md-header__option:first-of-type {
-    margin-left: auto;
-  }
-}
-
 .webis-header__nav-item {
   display: flex;
   align-items: center;
@@ -311,12 +249,11 @@ html {
   text-underline-position: under;
 }
 
-.webis-header__nav + .md-header__option,
 .webis-header__nav + .webis-header__source {
   margin-left: 0.75rem;
 }
 
-/* Small icon buttons: palette toggle and repository (icon only). */
+/* Small icon button for the repository (icon only). */
 .webis-header .md-header__button.md-icon {
   margin: 0.2rem 0.1rem;
   padding: 0.3rem;

@@ -41,12 +41,14 @@ def _build(
     return site_dir
 
 
-def test_style_and_palette(tmp_path: Path) -> None:
+def test_style_and_scheme(tmp_path: Path) -> None:
     site_dir = _build(tmp_path, "")
     assert (site_dir / "assets" / "webis" / "webis.css").is_file()
     html = (site_dir / "index.html").read_text()
     assert "assets/webis/webis.css" in html
     assert 'data-md-color-scheme="webis"' in html
+    # Light mode only, without a toggle.
+    assert 'data-md-component="palette"' not in html
     assert "fonts.googleapis.com" not in html
     assert (site_dir / "assets" / "webis" / "webis-logo.png").is_file()
     assert "assets/webis/webis-logo.png" in html
@@ -64,13 +66,8 @@ def test_header(tmp_path: Path) -> None:
     assert 'class="md-header md-header--shadow webis-header"' in html
     assert 'class="webis-header__nav-link"' in html
     assert 'class="md-tabs"' not in html
-    # Order: navigation, palette toggle, repository icon (then search, if enabled).
-    positions = [
-        html.index("webis-header__nav"),
-        html.index('data-md-component="palette"'),
-        html.index("webis-header__source"),
-    ]
-    assert positions == sorted(positions)
+    # Order: navigation, then repository icon (then search, if enabled).
+    assert html.index("webis-header__nav") < html.index("webis-header__source")
 
 
 def test_no_header(tmp_path: Path) -> None:
@@ -101,12 +98,12 @@ def test_own_logo(tmp_path: Path) -> None:
 
 def test_no_style(tmp_path: Path) -> None:
     site_dir = _build(
-        tmp_path, ":\n      style: false\n      palette: false\n      logo: false"
+        tmp_path, ":\n      style: false\n      logo: false"
     )
     assert not (site_dir / "assets" / "webis" / "webis.css").exists()
     assert not (site_dir / "assets" / "webis" / "webis-logo.png").exists()
     html = (site_dir / "index.html").read_text()
-    assert 'data-md-color-scheme="webis"' not in html
+    assert "assets/webis/webis.css" not in html
 
 
 def test_citations(tmp_path: Path) -> None:

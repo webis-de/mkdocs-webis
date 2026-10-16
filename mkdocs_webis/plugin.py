@@ -17,22 +17,8 @@ _FAVICON_PATH = "assets/webis/favicon.png"
 _DEFAULT_FAVICON_PATH = "assets/images/favicon.png"
 _GOOGLE_FONTS = {"text": "Noto Sans", "code": "Noto Sans Mono"}
 
-_PALETTE = [
-    {
-        "media": "(prefers-color-scheme: light)",
-        "scheme": "webis",
-        "primary": "custom",
-        "accent": "custom",
-        "toggle": {"icon": "material/weather-night", "name": "Switch to dark mode"},
-    },
-    {
-        "media": "(prefers-color-scheme: dark)",
-        "scheme": "webis-dark",
-        "primary": "custom",
-        "accent": "custom",
-        "toggle": {"icon": "material/weather-sunny", "name": "Switch to light mode"},
-    },
-]
+# Only the light color scheme of webis.de, without a toggle.
+_PALETTE = {"scheme": "webis", "primary": "custom", "accent": "custom"}
 
 log = get_plugin_logger(__name__)
 
@@ -40,8 +26,6 @@ log = get_plugin_logger(__name__)
 class WebisPluginConfig(base.Config):
     style = config_options.Type(bool, default=True)
     """Add the Webis stylesheet."""
-    palette = config_options.Type(bool, default=True)
-    """Use the Webis light and dark color schemes for the Material theme."""
     google_fonts = config_options.Type(bool, default=False)
     """Load Noto Sans from Google Fonts (otherwise, only use installed fonts)."""
     header = config_options.Type(bool, default=True)
@@ -75,8 +59,7 @@ class WebisPlugin(BasePlugin[WebisPluginConfig]):
                 f"but the theme is '{theme.name}'."
             )
         else:
-            if self.config.palette:
-                theme["palette"] = _PALETTE
+            theme["palette"] = dict(_PALETTE)
             if self.config.header:
                 # After the user's custom_dir, so that it can still override templates.
                 templates_dir = str(files("mkdocs_webis").joinpath("templates"))
