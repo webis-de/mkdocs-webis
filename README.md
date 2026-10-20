@@ -11,12 +11,13 @@
 
 # 📘 mkdocs-webis
 
-Webis style and BibTeX citations for [MkDocs Material](https://squidfunk.github.io/mkdocs-material/).
+Webis style, BibTeX citations, and Jupyter notebooks for [MkDocs Material](https://squidfunk.github.io/mkdocs-material/).
 
 This MkDocs plugin...
 
 - ... styles your documentation like the [Webis homepage](https://webis.de/) (a dark gray navigation bar with the Webis logo, the "Product Sans" and "Noto Sans" fonts, plain headings, blue links and buttons, flat tables, and a light gray footer),
-- ... lets you cite references from a BibTeX file with `[@key]` or `[@key1, @key2]`, rendered as gray author–year citations like "[Fang et al., 2004]", and appends a list of the cited references (including their BibTeX) to each page.
+- ... lets you cite references from a BibTeX file with `[@key]` or `[@key1, @key2]`, rendered as gray author–year citations like "[Fang et al., 2004]", and appends a list of the cited references (including their BibTeX) to each page,
+- ... renders Jupyter notebooks as pages that look like the rest of your documentation (optional).
 
 The [documentation](https://webis-de.github.io/mkdocs-webis/) is rendered with the plugin itself, so it doubles as a demo.
 
@@ -40,6 +41,8 @@ plugins:
   - webis:
       # Optional: BibTeX file in your docs directory.
       bibliography: references.bib
+      # Optional: render Jupyter notebooks.
+      notebooks: true
 ```
 
 ### Citations
@@ -57,6 +60,22 @@ Multiple keys are separated by commas or semicolons.
 Citations also work in API docstrings rendered by [mkdocstrings](https://mkdocstrings.github.io/).
 
 We recommend copying BibTeX entries from [DBLP](https://dblp.org/).
+
+### Notebooks
+
+With `notebooks` enabled, Jupyter notebooks (`.ipynb`) in your docs directory become pages, which you can add to the `nav` like Markdown pages:
+
+```yaml
+nav:
+  - Tutorial: tutorial.ipynb
+```
+
+The notebooks are converted to Markdown with [nbconvert](https://nbconvert.readthedocs.io/) and then rendered like any other page.
+Code cells display as code blocks, data frames as compact tables, and Markdown cells support the same extensions (including citations).
+Notebooks are never executed: the pages show the outputs stored in the notebooks, ignoring logs (stderr).
+Widgets (e.g., sliders or progress bars) are shown as disabled HTML elements in the state when the notebook was saved (if the notebook contains the [widget state][TODO link to setting]).
+If [configured](https://squidfunk.github.io/mkdocs-material/reference/math/), math be used in Markdown cells or LaTeX outputs.
+A button at the top of the page downloads the notebook.
 
 ### Style Elements
 

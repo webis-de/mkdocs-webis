@@ -3,6 +3,8 @@ from pathlib import Path
 from mkdocs.commands.build import build
 from mkdocs.config import load_config
 from mkdocs.exceptions import Abort, PluginError
+from nbformat import writes
+from nbformat.v4 import new_code_cell, new_markdown_cell, new_notebook, new_output
 from pytest import raises
 
 BIBTEX = """@article{doe2020test,
@@ -20,11 +22,14 @@ def _build(
     page: str = "# Home\n",
     theme: str = "",
     extra_config: str = "",
+    files: dict[str, str] | None = None,
 ) -> Path:
     docs_dir = tmp_path / "docs"
     docs_dir.mkdir()
     (docs_dir / "index.md").write_text(page)
     (docs_dir / "references.bib").write_text(BIBTEX)
+    for name, content in (files or {}).items():
+        (docs_dir / name).write_text(content)
     config_file = tmp_path / "mkdocs.yml"
     config_file.write_text(
         "site_name: Test\n"
@@ -134,3 +139,166 @@ def test_citations_in_rendered_html(tmp_path: Path) -> None:
     assert '&#91;<a href="#doe2020test">Doe, 2020</a>&#93;' in html
     assert '<h2 id="references">References</h2>' in html
     assert '<div class="reference" id="doe2020test">' in html
+
+
+def _notebook() -> str:
+    return writes(
+        new_notebook(
+            cells=[
+                new_markdown_cell("# Notebook\n\nAs shown before [@doe2020test]."),
+                new_code_cell(
+                    "print('hello')\nframe",
+                    outputs=[
+                        new_output("stream", name="stdout", text="hello\n"),
+                        new_output("stream", name="stderr", text="Some warning\n"),
+                        new_output(
+                            "display_data",
+                            data={
+                                "application/vnd.jupyter.widget-view+json": {},
+                                "text/plain": "Progress: 100%",
+                            },
+                        ),
+                        new_output(
+                            "execute_result",
+                            data={
+                                "text/html": '<table border="1" class="dataframe">'
+                                "<tr><td>1</td></tr></table>",
+                                "text/plain": "   a\n0  1",
+                            },
+                            execution_count=1,
+                        ),
+                        new_output(
+                            "display_data",
+                            data={"image/svg+xml": "<svg></svg>"},
+                        ),
+                    ],
+                    execution_count=1,
+                ),
+                new_code_cell(
+                    "1 / 0",
+                    outputs=[
+                        new_output(
+                            "error",
+                            ename="ZeroDivisionError",
+                            evalue="division by zero",
+                            traceback=[
+                                "\x1b[31mZeroDivisionError\x1b[0m: division by zero"
+                            ],
+                        ),
+                    ],
+                    execution_count=2,
+                ),
+                new_code_cell("1 + 1", outputs=[]),
+            ],
+            metadata={"language_info": {"name": "python"}},
+        )
+    )
+
+
+def test_notebooks(tmp_path: Path) -> None:
+    site_dir = _build(
+        tmp_path,
+        ":\n      bibliography: references.bib\n      notebooks: true",
+        extra_config=(
+            "markdown_extensions:\n  - pymdownx.highlight\n  - pymdownx.superfences\n"
+        ),
+        files={"notebook.ipynb": _notebook()},
+    )
+    html = (site_dir / "notebook" / "index.html").read_text()
+    # Markdown cells are rendered like other pages (e.g., with citations).
+    assert '<h1 id="notebook">Notebook</h1>' in html
+    assert '&#91;<a href="#doe2020test">Doe, 2020</a>&#93;' in html
+    # Code cells and text outputs are code blocks, with prompts like in Jupyter.
+    assert '<span class="nb">print</span>' in html
+    assert "<code>hello\n</code>" in html
+    assert '<div class="jupyter-prompt jupyter-prompt--input">In [1]:</div>' in html
+    assert '<div class="jupyter-prompt jupyter-prompt--input">In [ ]:</div>' in html
+    assert '<div class="jupyter-prompt jupyter-prompt--output">Out[1]:</div>' in html
+    # Errors show the traceback (without colors).
+    assert "<code>ZeroDivisionError: division by zero\n</code>" in html
+    # Vector graphics are embedded.
+    assert 'src="data:image/svg+xml;base64,PHN2Zz48L3N2Zz4="' in html
+    # Data frames use the theme's table style.
+    assert "<table><tr><td>1</td></tr></table>" in html
+    # Logs and widgets are skipped.
+    assert "Some warning" not in html
+    assert "Progress: 100%" not in html
+    # The notebook itself can be downloaded.
+    assert (site_dir / "notebook.ipynb").is_file()
+    assert 'href="../notebook.ipynb" title="Download notebook"' in html
+
+
+def test_notebooks_disabled(tmp_path: Path) -> None:
+    site_dir = _build(tmp_path, "", files={"notebook.ipynb": _notebook()})
+    assert not (site_dir / "notebook" / "index.html").exists()
+    assert (site_dir / "notebook.ipynb").is_file()
+
+
+def _widget_notebook() -> str:
+    def model(name: str, **state: object) -> dict[str, object]:
+        return {"model_name": f"{name}Model", "state": state}
+
+    def view(model_id: str) -> dict[str, object]:
+        return {
+            "application/vnd.jupyter.widget-view+json": {"model_id": model_id},
+            "text/plain": f"Widget {model_id}",
+        }
+
+    return writes(
+        new_notebook(
+            cells=[
+                new_code_cell(
+                    "IntSlider()",
+                    outputs=[
+                        new_output(
+                            "execute_result", data=view("box"), execution_count=1
+                        ),
+                        new_output("display_data", data=view("unknown")),
+                    ],
+                    execution_count=1,
+                ),
+            ],
+            metadata={
+                "widgets": {
+                    "application/vnd.jupyter.widget-state+json": {
+                        "state": {
+                            "box": model(
+                                "HBox",
+                                children=["IPY_MODEL_slider", "IPY_MODEL_output"],
+                            ),
+                            "slider": model(
+                                "IntSlider", description="<k>", min=1, max=9, value=3
+                            ),
+                            "output": model(
+                                "Output",
+                                outputs=[
+                                    {
+                                        "output_type": "stream",
+                                        "name": "stdout",
+                                        "text": "k is 3\n",
+                                    }
+                                ],
+                            ),
+                        },
+                    },
+                },
+            },
+        )
+    )
+
+
+def test_notebook_widgets(tmp_path: Path) -> None:
+    site_dir = _build(
+        tmp_path,
+        ":\n      notebooks: true",
+        files={"notebook.ipynb": _widget_notebook()},
+    )
+    html = (site_dir / "notebook" / "index.html").read_text()
+    # Widgets are shown disabled, as saved in the widget state.
+    assert '<div class="jupyter-prompt jupyter-prompt--output">Out[1]:</div>' in html
+    assert '<span class="jupyter-widget__description">&lt;k&gt;</span>' in html
+    assert '<input type="range" min="1" max="9" step="any" value="3" disabled>' in html
+    assert '<span class="jupyter-widget__readout">3</span>' in html
+    assert "<pre><code>k is 3</code></pre>" in html
+    # Widgets without saved state are skipped.
+    assert "Widget" not in html

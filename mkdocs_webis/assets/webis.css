@@ -516,28 +516,32 @@ html {
   box-shadow: none;
 }
 
-.md-typeset table:not([class]) th {
+.md-typeset table:not([class]) th,
+.md-typeset table:not([class]) td {
+  padding: 0.8em 0.6em;
+  border: none;
+  vertical-align: top;
+}
+
+.md-typeset table:not([class]) thead th {
   background-color: transparent;
   color: var(--md-default-fg-color--light);
   font-size: 0.875em;
   font-weight: 700;
   text-transform: uppercase;
   vertical-align: bottom;
+}
+
+/*
+ * Lines below the header and between rows, for whole rows, including row
+ * headers (e.g., the indexes of data frames, which can span multiple rows).
+ */
+.md-typeset table:not([class]) thead tr:last-child > * {
   border-bottom: 1px solid var(--webis-rule-color);
 }
 
-.md-typeset table:not([class]) td {
+.md-typeset table:not([class]) tbody tr + tr > * {
   border-top: 1px solid var(--webis-rule-color);
-  vertical-align: top;
-}
-
-.md-typeset table:not([class]) tbody tr:first-child td {
-  border-top: none;
-}
-
-.md-typeset table:not([class]) th,
-.md-typeset table:not([class]) td {
-  padding: 0.8em 0.6em;
 }
 
 .md-typeset table:not([class]) tbody tr:hover {
@@ -649,6 +653,118 @@ html {
 .md-typeset .admonition pre > code,
 .md-typeset details pre > code {
   background-color: var(--md-code-bg-color);
+}
+
+/* ------------------------------------------------------------------------
+ * Jupyter notebooks: "In [1]:" and "Out[1]:" prompts above the code blocks
+ * of inputs and outputs, like in Jupyter, and text outputs on gray.
+ * --------------------------------------------------------------------- */
+
+.md-typeset .jupyter-prompt {
+  margin: 1em 0 -0.6em;
+  font-family: var(--md-code-font-family);
+  font-size: 0.8em;
+  line-height: 1.4;
+}
+
+/* Gray, like citations. */
+.md-typeset .jupyter-prompt {
+  color: var(--md-default-fg-color--light);
+}
+
+/* Outputs without prompt (e.g., printed text) directly follow the input. */
+.md-typeset .jupyter-prompt--output:empty {
+  margin-bottom: -0.4em;
+}
+
+.md-typeset .jupyter-prompt--output + .highlight pre > code,
+.md-typeset .jupyter-prompt--output + pre > code,
+.md-typeset .jupyter-widget--output pre > code {
+  background-color: var(--md-code-bg-color);
+  border-color: transparent;
+}
+
+/* Data frames (and other HTML tables) are more compact than other tables. */
+.md-typeset .jupyter-html table:not([class]) th,
+.md-typeset .jupyter-html table:not([class]) td {
+  padding: 0.3em 0.6em;
+}
+
+/* Widgets, disabled, as saved in the notebook (without a running kernel). */
+.md-typeset .jupyter-widgets {
+  margin: 1em 0;
+  accent-color: var(--webis-blue);
+}
+
+.md-typeset .jupyter-widget--hbox {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6em;
+}
+
+.md-typeset .jupyter-widget--vbox {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.4em;
+}
+
+.md-typeset .jupyter-widget--control,
+.md-typeset .jupyter-widget--checkbox {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6em;
+}
+
+.md-typeset .jupyter-widget__description,
+.md-typeset .jupyter-widget__readout {
+  color: var(--md-default-fg-color--light);
+}
+
+.md-typeset .jupyter-widget__readout {
+  font-family: var(--md-code-font-family);
+  font-size: 0.875em;
+}
+
+.md-typeset .jupyter-widgets input[type="text"],
+.md-typeset .jupyter-widgets textarea,
+.md-typeset .jupyter-widgets select {
+  padding: 0.2em 0.4em;
+  border: 1px solid var(--webis-rule-color);
+  background-color: var(--webis-surface-color);
+  color: var(--md-default-fg-color--light);
+  font: inherit;
+}
+
+.md-typeset .jupyter-widget__button {
+  padding: 0.2em 1em;
+  border: 1px solid var(--webis-rule-color);
+  background-color: var(--webis-surface-color);
+  color: var(--md-default-fg-color--light);
+  font: inherit;
+}
+
+.md-typeset .jupyter-widget__button--pressed {
+  border-color: var(--webis-blue);
+  background-color: var(--webis-blue);
+  color: #ffffff;
+}
+
+.md-typeset .jupyter-widgets progress {
+  width: 12em;
+}
+
+.md-typeset .jupyter-widget__progress--success {
+  accent-color: var(--webis-green);
+}
+
+.md-typeset .jupyter-widget__progress--danger {
+  accent-color: var(--webis-red);
+}
+
+.md-typeset .jupyter-widget--output {
+  width: 100%;
 }
 
 /* ------------------------------------------------------------------------
