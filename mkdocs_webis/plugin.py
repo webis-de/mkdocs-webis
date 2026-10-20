@@ -10,6 +10,7 @@ from mkdocs.structure.files import File, Files
 from mkdocs.structure.pages import Page
 
 from mkdocs_webis.bibliography import Bibliography, BibliographyError
+from mkdocs_webis.notebooks import NotebookConverter, NotebookFile, notebook_pages
 
 _STYLESHEET_PATH = "assets/webis/webis.css"
 _LOGO_PATH = "assets/webis/webis-logo.png"
@@ -25,14 +26,18 @@ log = get_plugin_logger(__name__)
 class WebisPluginConfig(base.Config):
     bibliography = config_options.Optional(config_options.Type(str))
     """Path of a BibTeX file (relative to the docs directory) for citations."""
+    notebooks = config_options.Type(bool, default=False)
+    """Render Jupyter notebooks (`.ipynb`) as pages."""
 
 
 class WebisPlugin(BasePlugin[WebisPluginConfig]):
     """
-    MkDocs plugin for the Webis style and BibTeX citations.
+    MkDocs plugin for the Webis style, BibTeX citations, and Jupyter notebooks.
     """
 
     _bibliography: Bibliography | None = None
+    _notebook_converter: NotebookConverter | None = None
+    _notebooks: list[File] = []
     _logo: bool = False
     _favicon: bool = False
 
@@ -68,6 +73,8 @@ class WebisPlugin(BasePlugin[WebisPluginConfig]):
         return config
 
     def on_pre_build(self, *, config: MkDocsConfig) -> None:
+        if self.config.notebooks and self._notebook_converter is None:
+            self._notebook_converter = NotebookConverter()
         self._bibliography = None
         if self.config.bibliography is None:
             return
@@ -103,7 +110,22 @@ class WebisPlugin(BasePlugin[WebisPluginConfig]):
                     content=files_resource("favicon.png").read_bytes(),
                 )
             )
+        self._notebooks = notebook_pages(files) if self.config.notebooks else []
         return files
+
+    def on_page_read_source(self, /, *, page: Page, config: MkDocsConfig) -> str | None:
+        if (
+            self._notebook_converter is None
+            or not isinstance(page.file, NotebookFile)
+            or page.file.abs_src_path is None
+        ):
+            return None
+        return self._notebook_converter.convert(page.file.abs_src_path)
+
+    def on_post_build(self, *, config: MkDocsConfig) -> None:
+        # Copy the notebooks themselves, e.g., for downloading them.
+        for notebook in self._notebooks:
+            notebook.copy_file()
 
     def on_page_markdown(
         self, markdown: str, /, *, page: Page, config: MkDocsConfig, files: Files

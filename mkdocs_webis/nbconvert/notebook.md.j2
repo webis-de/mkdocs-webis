@@ -1,0 +1,56 @@
+{#- Jupyter notebooks as MkDocs pages, based on nbconvert's Markdown template. -#}
+{%- extends 'markdown/index.md.j2' -%}
+
+{#- Prompts before inputs and outputs, like in Jupyter (styled by the stylesheet). -#}
+{% block in_prompt %}
+<div class="jupyter-prompt jupyter-prompt--input">In [{{ cell.execution_count or ' ' }}]:</div>
+{% endblock in_prompt %}
+
+{#-
+Skip logs and warnings. Show widgets as saved in the notebook's widget state (disabled),
+or skip them if the state was not saved (as their text representation is not useful).
+-#}
+{% block output scoped %}
+{%- set is_widget = 'application/vnd.jupyter.widget-view+json' in output.get('data', {}) -%}
+{%- set widget = output.data['application/vnd.jupyter.widget-view+json'] | widget(nb.metadata) if is_widget else '' -%}
+{%- if not (output.output_type == 'stream' and output.name != 'stdout' or is_widget and not widget) %}
+<div class="jupyter-prompt jupyter-prompt--output">
+{%- if output.output_type == 'execute_result' -%}
+Out[{{ output.execution_count or ' ' }}]:
+{%- endif -%}
+</div>
+{% if widget %}
+{{ widget }}
+{% else %}
+{{ super() }}
+{%- endif -%}
+{%- endif -%}
+{% endblock output %}
+
+{#- Show text outputs as (fenced) code blocks. -#}
+{% block stream %}
+```text
+{{ output.text | strip_ansi | trim }}
+```
+{% endblock stream %}
+
+{% block data_text scoped %}
+```text
+{{ output.data['text/plain'] | strip_ansi | trim }}
+```
+{% endblock data_text %}
+
+{% block error %}
+```text
+{{ output.traceback | join('\n') | strip_ansi | trim }}
+```
+{% endblock error %}
+
+{#- Embed vector graphics (which notebooks store as text, not base64). -#}
+{% block data_svg %}
+![svg](data:image/svg+xml;base64,{{ output.data['image/svg+xml'] | base64 }})
+{% endblock data_svg %}
+
+{% block data_html scoped %}
+{{ output.data['text/html'] | html_output }}
+{% endblock data_html %}

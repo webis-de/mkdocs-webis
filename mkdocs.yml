@@ -34,6 +34,7 @@ plugins:
   - search
   - webis:
       bibliography: references.bib
+      notebooks: true
 
 markdown_extensions:
   - admonition
@@ -43,6 +44,8 @@ markdown_extensions:
   - tables
   - toc:
       permalink: true
+  - pymdownx.arithmatex:
+      generic: true
   - pymdownx.details
   - pymdownx.emoji:
       emoji_index: !!python/name:material.extensions.emoji.twemoji
@@ -53,6 +56,10 @@ markdown_extensions:
   - pymdownx.superfences
   - pymdownx.tabbed:
       alternate_style: true
+
+extra_javascript:
+  - javascripts/mathjax.js
+  - https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js
 
 extra:
   social:
@@ -66,4 +73,5 @@ extra:
 nav:
   - Home: index.md
   - Citations: citations.md
+  - Notebooks: notebooks.ipynb
   - Style Elements: style.md
