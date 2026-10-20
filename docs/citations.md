@@ -22,6 +22,7 @@ A journal article looks like this: [@fang2011diagnostic].
 
 - Separate multiple keys by commas (semicolons work, too).
 - Citations inside inline code or code blocks are not replaced, as in the example above.
+- Citations in content that other plugins insert while rendering a page (e.g., API docstrings from [mkdocstrings](https://mkdocstrings.github.io/)) are replaced, too, and their references are added to the "References" section.
 - Unknown keys and invalid BibTeX files fail the build.
 - LaTeX markup in the BibTeX fields (e.g., `{\"{o}}` for "ö") is converted to plain text.
 

@@ -149,3 +149,30 @@ def test_process_unknown_key() -> None:
     bibliography = Bibliography(entries=parse_bibtex(BIBTEX))
     with raises(BibliographyError):
         bibliography.process("See [@unknown].")
+
+
+def test_process_html_citations() -> None:
+    bibliography = Bibliography(entries=parse_bibtex(BIBTEX))
+    html = bibliography.process_html("<p>See [@lv2011lower; @fang2004formal].</p>")
+    assert '<a href="#fang2004formal">Fang et al., 2004</a>' in html
+    assert '<h2 id="references">References</h2>' in html
+    # Sorted by first author.
+    assert html.index('id="fang2004formal"') < html.index('id="lv2011lower"')
+
+
+def test_process_html_adds_missing_references() -> None:
+    bibliography = Bibliography(entries=parse_bibtex(BIBTEX))
+    html = bibliography.process_html(
+        "<p>See [@fang2004formal, @lv2011lower].</p>\n"
+        '<h2 id="references">References</h2>\n'
+        '<div class="reference" id="fang2004formal">...</div>'
+    )
+    assert html.count('id="references"') == 1
+    assert html.count('id="fang2004formal"') == 1
+    assert '<div class="reference" id="lv2011lower">' in html
+
+
+def test_process_html_ignores_code() -> None:
+    bibliography = Bibliography(entries=parse_bibtex(BIBTEX))
+    html = "<p>Use <code>[@key]</code> to cite.</p>\n<pre><code>[@unknown]\n</code></pre>"
+    assert bibliography.process_html(html) == html

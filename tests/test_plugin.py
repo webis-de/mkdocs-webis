@@ -115,3 +115,22 @@ def test_unknown_citation(tmp_path: Path) -> None:
 def test_missing_bibliography(tmp_path: Path) -> None:
     with raises((PluginError, Abort)):
         _build(tmp_path, ":\n      bibliography: missing.bib")
+
+
+def test_citations_in_rendered_html(tmp_path: Path) -> None:
+    # Simulate content inserted while rendering the Markdown (e.g., docstrings).
+    (tmp_path / "hooks.py").write_text(
+        "def on_page_markdown(markdown, **kwargs):\n"
+        "    return markdown.replace('DOCSTRING', '<p>[@doe2020test]</p>')\n"
+    )
+    site_dir = _build(
+        tmp_path,
+        ":\n      bibliography: references.bib",
+        page="# Home\n\nDOCSTRING\n",
+        extra_config="hooks:\n  - hooks.py\n",
+    )
+    html = (site_dir / "index.html").read_text()
+    assert "[@doe2020test]" not in html
+    assert '&#91;<a href="#doe2020test">Doe, 2020</a>&#93;' in html
+    assert '<h2 id="references">References</h2>' in html
+    assert '<div class="reference" id="doe2020test">' in html

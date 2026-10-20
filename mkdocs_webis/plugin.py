@@ -115,6 +115,18 @@ class WebisPlugin(BasePlugin[WebisPluginConfig]):
         except BibliographyError as error:
             raise PluginError(f"{error} (in {page.file.src_uri})") from error
 
+    def on_page_content(
+        self, html: str, /, *, page: Page, config: MkDocsConfig, files: Files
+    ) -> str | None:
+        # Citations from content that other plugins insert while rendering the
+        # Markdown (e.g., docstrings from mkdocstrings).
+        if self._bibliography is None:
+            return html
+        try:
+            return self._bibliography.process_html(html)
+        except BibliographyError as error:
+            raise PluginError(f"{error} (in {page.file.src_uri})") from error
+
 
 def files_resource(name: str) -> Traversable:
     return files("mkdocs_webis").joinpath("assets", name)

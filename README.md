@@ -54,6 +54,7 @@ Some studies use axioms for re-ranking [@hagen2016axiomatic, @bondarenko2022axio
 Citations are rendered as gray author–year links in brackets (e.g., "[Fang et al., 2004]" or "[Hagen et al., 2016; Bondarenko et al., 2022]"), like on the Webis slides.
 They link to a "References" section at the bottom of the same page, which lists all references cited on that page.
 Multiple keys are separated by commas or semicolons.
+Citations also work in API docstrings rendered by [mkdocstrings](https://mkdocstrings.github.io/).
 
 We recommend copying BibTeX entries from [DBLP](https://dblp.org/).
 

@@ -5,13 +5,15 @@ Citations from a BibTeX file.
   e.g., "[Fang et al., 2004]".
 - Each page that cites at least one reference gets a references section at the
   bottom, listing the cited references, including the BibTeX of each entry.
+- Citations that only appear in the rendered HTML (e.g., from docstrings
+  inserted by mkdocstrings) are replaced as well, and their references are added.
 """
 
 from collections.abc import Iterable, Mapping
 from dataclasses import dataclass, field
 from html import escape
 from pathlib import Path
-from re import DOTALL, MULTILINE, Match, compile as re_compile
+from re import DOTALL, MULTILINE, Match, Pattern, compile as re_compile
 from typing import Final
 
 from bibtexparser.entrypoint import parse_string
@@ -26,6 +28,8 @@ _PATTERN_CITATION_SEPARATOR: Final = re_compile(r"\s*[,;]\s*")
 _PATTERN_CODE: Final = re_compile(
     r"(^[ \t]*```.*?^[ \t]*```|`[^`\n]+`)", MULTILINE | DOTALL
 )
+# Code blocks and inline code in HTML, in which citations are not replaced.
+_PATTERN_CODE_HTML: Final = re_compile(r"(<pre\b.*?</pre>|<code\b.*?</code>)", DOTALL)
 # Fields that are not LaTeX (where, e.g., "%" is not a comment).
 _VERBATIM_FIELDS: Final = frozenset({"url", "doi", "eprint"})
 
@@ -239,16 +243,20 @@ class Bibliography:
         blocks.extend(self.render_reference(entry) for entry in entries)
         return "\n\n".join(blocks) + "\n"
 
-    def process(self, markdown: str) -> str:
-        """Replace citations and append the references section, if any."""
+    def _replace_citations(self, text: str, code_pattern: Pattern[str]) -> str:
+        """Replace citations outside of code and remember the cited keys."""
         self._cited_keys = set()
         # Odd indices of the split are code, which is kept as is.
-        markdown = "".join(
+        return "".join(
             part
             if index % 2 == 1
             else _PATTERN_CITATION.sub(self._replace_citation, part)
-            for index, part in enumerate(_PATTERN_CODE.split(markdown))
+            for index, part in enumerate(code_pattern.split(text))
         )
+
+    def process(self, markdown: str) -> str:
+        """Replace citations and append the references section, if any."""
+        markdown = self._replace_citations(markdown, _PATTERN_CODE)
         if self._cited_keys:
             markdown = (
                 markdown.rstrip()
@@ -256,3 +264,25 @@ class Bibliography:
                 + self.render_references(self._cited_keys)
             )
         return markdown
+
+    def process_html(self, html: str) -> str:
+        """
+        Replace citations that remain in the rendered HTML of a page (e.g., from
+        docstrings) and append their references, unless already listed.
+        """
+        html = self._replace_citations(html, _PATTERN_CODE_HTML)
+        missing = [
+            self.entries[key]
+            for key in self._cited_keys
+            if f'<div class="reference" id="{escape(key)}">' not in html
+        ]
+        if not missing:
+            return html
+        blocks = [html.rstrip()]
+        if 'id="references"' not in html:
+            blocks.append('<h2 id="references">References</h2>')
+        blocks.extend(
+            self.render_reference(entry)
+            for entry in sorted(missing, key=lambda e: e.sort_key)
+        )
+        return "\n".join(blocks) + "\n"
