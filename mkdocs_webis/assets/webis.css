@@ -687,6 +687,7 @@ html {
 /* Data frames (and other HTML tables) are more compact than other tables. */
 .md-typeset .jupyter-html table:not([class]) th,
 .md-typeset .jupyter-html table:not([class]) td {
+  min-width: 0;
   padding: 0.3em 0.6em;
 }
 

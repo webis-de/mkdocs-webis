@@ -8,13 +8,15 @@ Unknown widgets are skipped.
 from collections.abc import Callable, Mapping
 from html import escape
 from math import log
-from typing import Any
+from re import DOTALL, compile as re_compile
+from typing import Any, Final
 
 from nbconvert.filters import strip_ansi
 
 WIDGET_VIEW_MIMETYPE = "application/vnd.jupyter.widget-view+json"
 WIDGET_STATE_MIMETYPE = "application/vnd.jupyter.widget-state+json"
 _MODEL_PREFIX = "IPY_MODEL_"
+_SCOPED_STYLE: Final = re_compile(r"<style scoped>.*?</style>\n?", DOTALL)
 
 
 def html_output(html: str) -> str:
@@ -22,6 +24,8 @@ def html_output(html: str) -> str:
     Wrap an HTML output, and use the theme's table style for data frames (which only applies to tables without a class).
     """
     html = html.replace(' border="1" class="dataframe"', "")
+    # The data frame style (for the class) would apply to all tables, as browsers ignore `scoped`.
+    html = _SCOPED_STYLE.sub("", html)
     return f'<div class="jupyter-html">\n{html}\n</div>'
 
 

@@ -174,5 +174,7 @@ def test_process_html_adds_missing_references() -> None:
 
 def test_process_html_ignores_code() -> None:
     bibliography = Bibliography(entries=parse_bibtex(BIBTEX))
-    html = "<p>Use <code>[@key]</code> to cite.</p>\n<pre><code>[@unknown]\n</code></pre>"
+    html = (
+        "<p>Use <code>[@key]</code> to cite.</p>\n<pre><code>[@unknown]\n</code></pre>"
+    )
     assert bibliography.process_html(html) == html

@@ -161,8 +161,10 @@ def _notebook() -> str:
                         new_output(
                             "execute_result",
                             data={
-                                "text/html": '<table border="1" class="dataframe">'
-                                "<tr><td>1</td></tr></table>",
+                                "text/html": "<div>\n<style scoped>\n"
+                                ".dataframe tbody tr th {}\n</style>\n"
+                                '<table border="1" class="dataframe">'
+                                "<tr><td>1</td></tr></table>\n</div>",
                                 "text/plain": "   a\n0  1",
                             },
                             execution_count=1,
@@ -220,6 +222,7 @@ def test_notebooks(tmp_path: Path) -> None:
     assert 'src="data:image/svg+xml;base64,PHN2Zz48L3N2Zz4="' in html
     # Data frames use the theme's table style.
     assert "<table><tr><td>1</td></tr></table>" in html
+    assert "<style scoped>" not in html
     # Logs and widgets are skipped.
     assert "Some warning" not in html
     assert "Progress: 100%" not in html

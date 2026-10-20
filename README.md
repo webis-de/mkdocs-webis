@@ -73,8 +73,8 @@ nav:
 The notebooks are converted to Markdown with [nbconvert](https://nbconvert.readthedocs.io/) and then rendered like any other page.
 Code cells display as code blocks, data frames as compact tables, and Markdown cells support the same extensions (including citations).
 Notebooks are never executed: the pages show the outputs stored in the notebooks, ignoring logs (stderr).
-Widgets (e.g., sliders or progress bars) are shown as disabled HTML elements in the state when the notebook was saved (if the notebook contains the [widget state][TODO link to setting]).
-If [configured](https://squidfunk.github.io/mkdocs-material/reference/math/), math be used in Markdown cells or LaTeX outputs.
+Widgets (e.g., sliders or progress bars) are shown as disabled HTML elements in the state when the notebook was saved (if the notebook contains the [widget state](https://ipywidgets.readthedocs.io/en/stable/embedding.html#save-notebook-widget-state)).
+If [configured](https://squidfunk.github.io/mkdocs-material/reference/math/), math can be used in Markdown cells or LaTeX outputs.
 A button at the top of the page downloads the notebook.
 
 ### Style Elements

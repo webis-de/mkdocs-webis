@@ -199,8 +199,7 @@ class Bibliography:
 
     def _replace_citation(self, match: Match[str]) -> str:
         keys = [
-            key.lstrip("@")
-            for key in _PATTERN_CITATION_SEPARATOR.split(match.group(1))
+            key.lstrip("@") for key in _PATTERN_CITATION_SEPARATOR.split(match.group(1))
         ]
         links = []
         for key in keys:
@@ -221,7 +220,9 @@ class Bibliography:
             f'aria-label="Show BibTeX">'
         )
         links = [f'[<label for="bibtex-{key}">bib</label>]']
-        bibtex = f'<pre class="reference-bibtex"><code>{escape(entry.bibtex)}</code></pre>'
+        bibtex = (
+            f'<pre class="reference-bibtex"><code>{escape(entry.bibtex)}</code></pre>'
+        )
         if "doi" in entry.fields:
             doi = escape(f"https://doi.org/{entry.fields['doi']}")
             links.append(f'[<a href="{doi}">doi</a>]')
@@ -259,9 +260,7 @@ class Bibliography:
         markdown = self._replace_citations(markdown, _PATTERN_CODE)
         if self._cited_keys:
             markdown = (
-                markdown.rstrip()
-                + "\n\n"
-                + self.render_references(self._cited_keys)
+                markdown.rstrip() + "\n\n" + self.render_references(self._cited_keys)
             )
         return markdown
 
